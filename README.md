@@ -12,7 +12,7 @@ Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
 - [ ] Test training code for multi-speaker models (VCTK and LibriTTS)
 - [ ] Finish demo code for multispeaker model and uploade pre-trained models
-- [ ] Fix DDP (accelerator) for train_second.py
+- [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))***
 
 ## Pre-requisites
 1. Python >= 3.7
@@ -33,7 +33,7 @@ First stage training:
 ```bash
 accelerate launch train_first.py --config_path ./Configs/config.yml
 ```
-Second stage training **(DDP version not working, so the current version uses DP)**:
+Second stage training **(DDP version not working, so the current version uses DP, again see [#7](https://github.com/yl4579/StyleTTS2/issues/7) if you want to help)**:
 ```bash
 python train_second.py --config_path ./Configs/config.yml
 ```
