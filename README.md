@@ -11,8 +11,8 @@ Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
 - [ ] Test training code for multi-speaker models (VCTK and LibriTTS)
-- [ ] Finish demo code for multispeaker model and uploade pre-trained models
-- [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))***
+- [ ] Finish demo code for multispeaker model and upload pre-trained models
+- [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))**
 
 ## Pre-requisites
 1. Python >= 3.7
@@ -47,7 +47,10 @@ In [config.yml](https://github.com/yl4579/StyleTTS2/blob/main/Configs/config.yml
 - `min_length`: Minimum length of OOD texts for training. This is to make sure the synthesized speech has a minimum length.
 - `multispeaker`: Set to true if you want to train a multispeaker model. This is needed because the architecture of the denoiser is different for single and multispeaker models.
 - `batch_percentage`: This is to make sure during SLM adversarial training there are no out-of-memory (OOM) issues. If you encounter OOM problem, please set a lower number for this. 
-- 
+
+### Pre-trained modules
+In [Utils] folder, there are 
+
 ## Inference
 Please refer to [inference.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) for details. 
 
