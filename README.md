@@ -11,18 +11,19 @@ Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
 - [ ] Fix DDP (accelerator) for train_second.py
-- [ ] Testing training code for multi-speaker models (VCTK and LibriTTS)
+- [ ] Test training code for multi-speaker models (VCTK and LibriTTS)
+- [ ] Finish demo code for multispeaker model and uploade pre-trained models
 
 ## Pre-requisites
 1. Python >= 3.7
 2. Clone this repository:
 ```bash
-git clone https://github.com/yl4579/StyleTTS.git
-cd StyleTTS
+git clone https://github.com/yl4579/StyleTTS2.git
+cd StyleTTS2
 ```
 3. Install python requirements: 
 ```bash
-pip install SoundFile torchaudio munch torch pydub pyyaml librosa accelerate phonemizer git+https://github.com/resemble-ai/monotonic_align.git
+pip install SoundFile torchaudio munch torch pydub pyyaml librosa accelerate transformers phonemizer einops einops-exts tqdm typing typing-extensions git+https://github.com/resemble-ai/monotonic_align.git
 ```
 4. Download and extract the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/), unzip to the data folder and upsample the data to 24 kHz. The text aligner and pitch extractor are pre-trained on 24 kHz data, but you can easily change the preprocessing and re-train them using your own preprocessing. 
 For LibriTTS, you will need to combine train-clean-360 with train-clean-100 and rename the folder train-clean-460 (see [val_list_libritts.txt](https://github.com/yl4579/StyleTTS/blob/main/Data/val_list_libritts.txt) as an example).
