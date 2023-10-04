@@ -23,7 +23,12 @@ cd StyleTTS2
 ```
 3. Install python requirements: 
 ```bash
-pip install SoundFile torchaudio munch torch pydub pyyaml librosa nltk matplotlib accelerate transformers phonemizer einops einops-exts tqdm typing typing-extensions git+https://github.com/resemble-ai/monotonic_align.git
+pip install SoundFile torchaudio munch torch pydub pyyaml librosa nltk matplotlib accelerate transformers einops einops-exts tqdm typing typing-extensions git+https://github.com/resemble-ai/monotonic_align.git
+```
+Also install phonemizer and espeak if you want to run the demo:
+```bash
+pip install phonemizer
+sudo apt-get install espeak-ng
 ```
 4. Download and extract the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/), unzip to the data folder and upsample the data to 24 kHz. The text aligner and pitch extractor are pre-trained on 24 kHz data, but you can easily change the preprocessing and re-train them using your own preprocessing. 
 For LibriTTS, you will need to combine train-clean-360 with train-clean-100 and rename the folder train-clean-460 (see [val_list_libritts.txt](https://github.com/yl4579/StyleTTS/blob/main/Data/val_list_libritts.txt) as an example).
