@@ -641,9 +641,9 @@ def build_model(args, text_aligner, pitch_extractor, bert):
         
     # define diffusion model
     if args.multispeaker:
-        transformer = Transformer1d(channels=args.style_dim*2, 
+        transformer = StyleTransformer1d(channels=args.style_dim*2, 
                                     context_embedding_features=bert.config.hidden_size,
-                                    use_context_features=args.style_dim*2, 
+                                    context_features=args.style_dim*2, 
                                     **args.diffusion.transformer)
     else:
         transformer = Transformer1d(channels=args.style_dim*2, 
