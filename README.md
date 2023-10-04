@@ -23,7 +23,11 @@ cd StyleTTS2
 ```
 3. Install python requirements: 
 ```bash
-pip install SoundFile torchaudio munch torch pydub pyyaml librosa nltk matplotlib accelerate transformers einops einops-exts tqdm typing typing-extensions git+https://github.com/resemble-ai/monotonic_align.git
+pip install -r requirements.txt
+```
+On Windows add:
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 -U
 ```
 Also install phonemizer and espeak if you want to run the demo:
 ```bash
