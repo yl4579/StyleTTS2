@@ -707,11 +707,24 @@ def main(config_path):
         else:
             # generating sampled speech from text directly
             with torch.no_grad():
+                # compute reference styles
+                if multispeaker and epoch >= diff_epoch:
+                    ref_ss = model.style_encoder(ref_mels.unsqueeze(1))
+                    ref_sp = model.predictor_encoder(ref_mels.unsqueeze(1))
+                    ref_s = torch.cat([ref_ss, ref_sp], dim=1)
+                    
                 for bib in range(len(d_en)):
-                    s_pred = sampler(noise = torch.randn((1, 256)).unsqueeze(1).to(texts.device), 
-                          embedding=bert_dur[bib].unsqueeze(0),
-                          embedding_scale=1,
-                             num_steps=5).squeeze(1)
+                    if multispeaker:
+                        s_pred = sampler(noise = torch.randn((1, 256)).unsqueeze(1).to(texts.device), 
+                              embedding=bert_dur[bib].unsqueeze(0),
+                              embedding_scale=1,
+                                features=ref_s[bib].unsqueeze(0), # reference from the same speaker as the embedding
+                                 num_steps=5).squeeze(1)
+                    else:
+                        s_pred = sampler(noise = torch.randn((1, 256)).unsqueeze(1).to(texts.device), 
+                              embedding=bert_dur[bib].unsqueeze(0),
+                              embedding_scale=1,
+                                 num_steps=5).squeeze(1)
 
                     s = s_pred[:, 128:]
                     ref = s_pred[:, :128]
@@ -735,6 +748,11 @@ def main(config_path):
 
                     # encode prosody
                     en = (d.transpose(-1, -2) @ pred_aln_trg.unsqueeze(0).to(texts.device))
+                    if model_params.decoder.type == "hifigan":
+                        asr_new = torch.zeros_like(en)
+                        asr_new[:, :, 0] = en[:, :, 0]
+                        asr_new[:, :, 1:] = en[:, :, 0:-1]
+                        en = asr_new
                     F0_pred, N_pred = model.predictor.F0Ntrain(en, s)
                     out = model.decoder((t_en[bib, :, :input_lengths[bib]].unsqueeze(0) @ pred_aln_trg.unsqueeze(0).to(texts.device)), 
                                             F0_pred, N_pred, ref.squeeze().unsqueeze(0))
