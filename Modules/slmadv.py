@@ -27,7 +27,7 @@ class SLMAdversarialLoss(torch.nn.Module):
         else:
             num_steps = np.random.randint(3, 5)
             if ref_s is not None:
-                s_preds = self.sampler(noise = torch.randn_like(s_trg).unsqueeze(1).to(device), 
+                s_preds = self.sampler(noise = torch.randn_like(s_trg).unsqueeze(1).to(ref_text.device), 
                       embedding=bert_dur,
                       embedding_scale=1,
                                features=ref_s, # reference from the same speaker as the embedding
