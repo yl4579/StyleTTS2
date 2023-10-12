@@ -477,7 +477,7 @@ def main(config_path):
                                  waves, 
                                  mel_input_length,
                                  ref_texts, 
-                                 ref_lengths, use_ind, s_trg.detach())
+                                 ref_lengths, use_ind, s_trg.detach(), ref if multispeaker else None)
 
                 if slm_out is None:
                     continue
