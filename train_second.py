@@ -748,11 +748,6 @@ def main(config_path):
 
                     # encode prosody
                     en = (d.transpose(-1, -2) @ pred_aln_trg.unsqueeze(0).to(texts.device))
-                    if model_params.decoder.type == "hifigan":
-                        asr_new = torch.zeros_like(en)
-                        asr_new[:, :, 0] = en[:, :, 0]
-                        asr_new[:, :, 1:] = en[:, :, 0:-1]
-                        en = asr_new
                     F0_pred, N_pred = model.predictor.F0Ntrain(en, s)
                     out = model.decoder((t_en[bib, :, :input_lengths[bib]].unsqueeze(0) @ pred_aln_trg.unsqueeze(0).to(texts.device)), 
                                             F0_pred, N_pred, ref.squeeze().unsqueeze(0))
