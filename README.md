@@ -77,7 +77,7 @@ The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [Sty
 **The pretrained model on LibriTTS is currently WIP.**
 
 ### Common Issues
-- **High-pitched background noise**: This is caused by numerical float differences in older GPUs. For more details, please refer to issue [#13](https://github.com/yl4579/StyleTTS2/issues/13). Basically, you will need to use more modern GPUs or do inference the CPUs.
+- **High-pitched background noise**: This is caused by numerical float differences in older GPUs. For more details, please refer to issue [#13](https://github.com/yl4579/StyleTTS2/issues/13). Basically, you will need to use more modern GPUs or do inference on CPUs.
 
 ## References
 - [archinetai/audio-diffusion-pytorch](https://github.com/archinetai/audio-diffusion-pytorch)
