@@ -484,15 +484,15 @@ def main(config_path):
                     
                 d_loss_slm, loss_gen_lm, y_pred = slm_out
                 
-                # SLM discriminator loss
-                if d_loss_slm != 0:
-                    optimizer.zero_grad()
-                    d_loss_slm.backward()
-                    optimizer.step('wd')
-                
                 # SLM generator loss
                 optimizer.zero_grad()
                 loss_gen_lm.backward()
+
+                # SLM discriminator loss
+                if d_loss_slm != 0:
+                    optimizer.zero_grad()
+                    d_loss_slm.backward(retain_graph=True)
+                    optimizer.step('wd')
 
                 # compute the gradient norm
                 total_norm = {}
