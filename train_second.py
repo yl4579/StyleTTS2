@@ -369,10 +369,9 @@ def main(config_path):
                 continue
 
             s_dur = model.predictor_encoder(gt.unsqueeze(1))
+            s = model.style_encoder(gt.unsqueeze(1))
             
             with torch.no_grad():
-                s = model.style_encoder(gt.unsqueeze(1))
-
                 F0_real, _, F0 = model.pitch_extractor(gt.unsqueeze(1))
                 F0 = F0.reshape(F0.shape[0], F0.shape[1] * 2, F0.shape[2], 1).squeeze()
 
