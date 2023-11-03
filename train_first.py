@@ -120,6 +120,7 @@ def main(config_path):
     }
     
     model_params = recursive_munch(config['model_params'])
+    multispeaker = model_params.multispeaker
     model = build_model(model_params, text_aligner, pitch_extractor, plbert)
 
     best_loss = float('inf')  # best test loss
@@ -249,7 +250,7 @@ def main(config_path):
                 real_norm = log_norm(gt.unsqueeze(1)).squeeze(1).detach()
                 F0_real, _, _ = model.pitch_extractor(gt.unsqueeze(1))
                 
-            s = model.style_encoder(gt.unsqueeze(1))
+            s = model.style_encoder(st.unsqueeze(1) if multispeaker else gt.unsqueeze(1))
             
             y_rec = model.decoder(en, F0_real, real_norm, s)
             
