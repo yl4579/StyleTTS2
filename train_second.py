@@ -343,6 +343,7 @@ def main(config_path):
                                                     text_mask)
             
             mel_len = min(int(mel_input_length.min().item() / 2 - 1), max_len // 2)
+            mel_len_st = int(mel_input_length.min().item() / 2 - 1)
             en = []
             gt = []
             st = []
