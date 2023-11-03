@@ -10,7 +10,7 @@ Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
-- [x] Test training code for multi-speaker models (VCTK and LibriTTS)
+- [ ] Test training code for multi-speaker models (VCTK and LibriTTS)
 - [ ] Finish demo code for multispeaker model and upload pre-trained models
 - [ ] Add a finetuning script for new speakers with base pre-trained multispeaker models
 - [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))**
