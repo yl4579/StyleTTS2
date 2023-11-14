@@ -10,8 +10,8 @@ Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
-- [ ] Test training code for multi-speaker models (VCTK and LibriTTS)
-- [ ] Finish demo code for multispeaker model and upload pre-trained models
+- [x] Test training code for multi-speaker models (VCTK and LibriTTS)
+- [x] Finish demo code for multispeaker model and upload pre-trained models
 - [ ] Add a finetuning script for new speakers with base pre-trained multispeaker models
 - [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))**
 
@@ -70,11 +70,13 @@ In [Utils](https://github.com/yl4579/StyleTTS2/tree/main/Utils) folder, there ar
 - **Out of memory**: Please either use lower `batch_size` or `max_len`. You may refer to issue [#10](https://github.com/yl4579/StyleTTS2/issues/10) for more information.
 
 ## Inference
-Please refer to [inference.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) for details. 
+Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) (single-speaker) and [Inference_LibriTTS.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LibriTTS.ipynb) (multi-speaker) for details. For LibriTTS, you will also need to download [reference_audio.zip](https://drive.google.com/file/d/1YhQO4O4dAsvkMzWZM8nVFMglYyi554YT) and unzip it under the `demo` before running the demo. 
 
-The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [StyleTTS 2 Link](https://drive.google.com/file/d/1K3jt1JEbtohBLUA0X75KLw36TW7U1yxq/view?usp=sharing).
+The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [StyleTTS 2 LJSpeech Link](https://drive.google.com/file/d/1K3jt1JEbtohBLUA0X75KLw36TW7U1yxq/view?usp=sharing).
 
-**The pretrained model on LibriTTS is currently WIP.**
+The pretrained StyleTTS 2 model on LibriTTS can be downloaded at [StyleTTS 2 LibriTTS Link](https://drive.google.com/file/d/1jK_VV3TnGM9dkrIMsdQ_upov8FrIymr7/view).
+
+***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models. Moreovr, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
 
 ### Common Issues
 - **High-pitched background noise**: This is caused by numerical float differences in older GPUs. For more details, please refer to issue [#13](https://github.com/yl4579/StyleTTS2/issues/13). Basically, you will need to use more modern GPUs or do inference on CPUs.
