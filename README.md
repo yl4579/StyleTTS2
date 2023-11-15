@@ -74,7 +74,7 @@ The script is modified from `train_second.py` which uses DP, as DDP does not wor
 ```bash
 python train_finetune.py --config_path ./Configs/config_ft.yml
 ```
-Please make sure you have the LibriTTS checkpoint downloaded and unzipped under the folder. The default configuration `config_ft.yml` finetunes on LJSpeech with 1 hour of audio data (around 1k samples) for 50 epochs. This took about 6 hours to finish on four NVidia A100. The quality is slightly worse (similar to NaturalSpeech on LJSpeech) than LJSpeech model trained from scratch with 24 hours of data, which took 2.5 days to train on four A100. 
+Please make sure you have the LibriTTS checkpoint downloaded and unzipped under the folder. The default configuration `config_ft.yml` finetunes on LJSpeech with 1 hour of speech data (around 1k samples) for 50 epochs. This took about 4 hours to finish on four NVidia A100. The quality is slightly worse (similar to NaturalSpeech on LJSpeech) than LJSpeech model trained from scratch with 24 hours of speech data, which took around 2.5 days to finish on four A100. 
 
 ## Inference
 Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) (single-speaker) and [Inference_LibriTTS.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LibriTTS.ipynb) (multi-speaker) for details. For LibriTTS, you will also need to download [reference_audio.zip](https://drive.google.com/file/d/1YhQO4O4dAsvkMzWZM8nVFMglYyi554YT) and unzip it under the `demo` before running the demo. 
@@ -83,7 +83,7 @@ The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [Sty
 
 The pretrained StyleTTS 2 model on LibriTTS can be downloaded at [StyleTTS 2 LibriTTS Link](https://drive.google.com/file/d/1jK_VV3TnGM9dkrIMsdQ_upov8FrIymr7/view).
 
-***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models. Moreovr, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
+***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models. Moreover, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
 
 ### Common Issues
 - **High-pitched background noise**: This is caused by numerical float differences in older GPUs. For more details, please refer to issue [#13](https://github.com/yl4579/StyleTTS2/issues/13). Basically, you will need to use more modern GPUs or do inference on CPUs.
