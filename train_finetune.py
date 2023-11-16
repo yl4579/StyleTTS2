@@ -66,7 +66,7 @@ def main(config_path):
     
     batch_size = config.get('batch_size', 10)
 
-    epochs = config.get('epochs_2nd', 200)
+    epochs = config.get('epochs', 200)
     save_freq = config.get('save_freq', 2)
     log_interval = config.get('log_interval', 10)
     saving_epoch = config.get('save_freq', 2)
