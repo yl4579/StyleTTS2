@@ -8,6 +8,8 @@ Paper: [https://arxiv.org/abs/2306.07691](https://arxiv.org/abs/2306.07691)
 
 Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/)
+
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
 - [x] Test training code for multi-speaker models (VCTK and LibriTTS)
@@ -79,9 +81,13 @@ Please make sure you have the LibriTTS checkpoint downloaded and unzipped under 
 ## Inference
 Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) (single-speaker) and [Inference_LibriTTS.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LibriTTS.ipynb) (multi-speaker) for details. For LibriTTS, you will also need to download [reference_audio.zip](https://drive.google.com/file/d/1YhQO4O4dAsvkMzWZM8nVFMglYyi554YT) and unzip it under the `demo` before running the demo. 
 
-The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [StyleTTS 2 LJSpeech Link](https://drive.google.com/file/d/1K3jt1JEbtohBLUA0X75KLw36TW7U1yxq/view?usp=sharing).
+- The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [StyleTTS 2 LJSpeech Link](https://drive.google.com/file/d/1K3jt1JEbtohBLUA0X75KLw36TW7U1yxq/view?usp=sharing).
 
-The pretrained StyleTTS 2 model on LibriTTS can be downloaded at [StyleTTS 2 LibriTTS Link](https://drive.google.com/file/d/1jK_VV3TnGM9dkrIMsdQ_upov8FrIymr7/view).
+  Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/Colab/StyleTTS2_Demo_LJSpeech.ipynb)
+
+- The pretrained StyleTTS 2 model on LibriTTS can be downloaded at [StyleTTS 2 LibriTTS Link](https://drive.google.com/file/d/1jK_VV3TnGM9dkrIMsdQ_upov8FrIymr7/view). 
+
+  Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/Colab/StyleTTS2_Demo_LibriTTS.ipynb)
 
 ***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models. Moreover, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
 
