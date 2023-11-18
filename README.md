@@ -92,7 +92,7 @@ Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/b
 
   [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/Colab/StyleTTS2_Demo_LibriTTS.ipynb)
 
-***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models. Moreover, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
+***Before using these models, you agree to inform the listeners that the speech samples are synthesized by StyleTTS 2 models, unless you have the permission to use the voice you synthesize. That is, when using it for voice cloning, you also agree to only use voices whose speakers grant the permission to have their voice cloned, either directly or by license before making synthesized voices pubilc.***
 
 ### Common Issues
 - **High-pitched background noise**: This is caused by numerical float differences in older GPUs. For more details, please refer to issue [#13](https://github.com/yl4579/StyleTTS2/issues/13). Basically, you will need to use more modern GPUs or do inference on CPUs.
