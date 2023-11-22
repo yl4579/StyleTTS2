@@ -8,7 +8,7 @@ Paper: [https://arxiv.org/abs/2306.07691](https://arxiv.org/abs/2306.07691)
 
 Audio samples: [https://styletts2.github.io/](https://styletts2.github.io/)
 
-Online demo: [Hugging Face](https://huggingface.co/spaces/styletts2/styletts2)
+Online demo: [Hugging Face](https://huggingface.co/spaces/styletts2/styletts2) (thank [@fakerybakery](https://github.com/fakerybakery) for the wonderful online demo)
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/)
 
