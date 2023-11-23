@@ -59,7 +59,7 @@ The data list format needs to be `filename.wav|transcription|speaker`, see [val_
 In [config.yml](https://github.com/yl4579/StyleTTS2/blob/main/Configs/config.yml), there are a few important configurations to take care of:
 - `OOD_data`: The path for out-of-distribution texts for SLM adversarial training. The format should be `text|anything`.
 - `min_length`: Minimum length of OOD texts for training. This is to make sure the synthesized speech has a minimum length.
-- `max_len`: Maximum length of audio for training. The unit is frame. Since the default hop size is 300, one frame is approximately `300 / 24000` (0.125) second. Lowering this if you encounter the out-of-memory issue. 
+- `max_len`: Maximum length of audio for training. The unit is frame. Since the default hop size is 300, one frame is approximately `300 / 24000` (0.0125) second. Lowering this if you encounter the out-of-memory issue. 
 - `multispeaker`: Set to true if you want to train a multispeaker model. This is needed because the architecture of the denoiser is different for single and multispeaker models.
 - `batch_percentage`: This is to make sure during SLM adversarial training there are no out-of-memory (OOM) issues. If you encounter OOM problem, please set a lower number for this. 
 
