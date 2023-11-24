@@ -12,6 +12,8 @@ Online demo: [Hugging Face](https://huggingface.co/spaces/styletts2/styletts2) (
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/)
 
+[![Slack](https://img.shields.io/badge/join%20our%20community-Slack-yellowgreen)](https://join.slack.com/t/styletts2/shared_invite/zt-2805io6cg-0ROMhjfW9Gd_ix_FJqjGmQ)
+
 ## TODO
 - [x] Training and inference demo code for single-speaker models (LJSpeech)
 - [x] Test training code for multi-speaker models (VCTK and LibriTTS)
