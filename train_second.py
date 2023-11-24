@@ -494,12 +494,6 @@ def main(config_path):
                 optimizer.zero_grad()
                 loss_gen_lm.backward()
 
-                # SLM discriminator loss
-                if d_loss_slm != 0:
-                    optimizer.zero_grad()
-                    d_loss_slm.backward(retain_graph=True)
-                    optimizer.step('wd')
-
                 # compute the gradient norm
                 total_norm = {}
                 for key in model.keys():
@@ -533,6 +527,13 @@ def main(config_path):
                 optimizer.step('bert')
                 optimizer.step('predictor')
                 optimizer.step('diffusion')
+
+                # SLM discriminator loss
+                if d_loss_slm != 0:
+                    optimizer.zero_grad()
+                    d_loss_slm.backward(retain_graph=True)
+                    optimizer.step('wd')
+
             else:
                 d_loss_slm, loss_gen_lm = 0, 0
                 
