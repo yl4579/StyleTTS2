@@ -42,6 +42,64 @@ sudo apt-get install espeak-ng
 4. Download and extract the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/), unzip to the data folder and upsample the data to 24 kHz. The text aligner and pitch extractor are pre-trained on 24 kHz data, but you can easily change the preprocessing and re-train them using your own preprocessing. 
 For LibriTTS, you will need to combine train-clean-360 with train-clean-100 and rename the folder train-clean-460 (see [val_list_libritts.txt](https://github.com/yl4579/StyleTTS/blob/main/Data/val_list_libritts.txt) as an example).
 
+## Python API
+
+You can now use StyleTTS 2 directly in your programs! A `pip`-compatible package is coming soon.
+
+Multi-Speaker Inference:
+
+```python
+from scipy.io.wavfile import write
+import msinference
+text = 'Hello world!'
+voice = msinference.compute_style('voice.wav')
+wav = msinference.inference(text, voice, alpha=0.3, beta=0.7, diffusion_steps=7, embedding_scale=1)
+write('result.wav', 24000, wav)
+```
+
+LJSpeech Inference:
+
+```python
+from scipy.io.wavfile import write
+import ljinference
+text = 'Hello world!'
+noise = torch.randn(1,1,256).to('cuda' if torch.cuda.is_available() else 'cpu')
+wav = ljinference.inference(text, noise, diffusion_steps=7, embedding_scale=1)
+write('result.wav', 24000, wav)
+```
+
+For longer text, you can [help implement #54](https://github.com/yl4579/StyleTTS2/issues/54) or use Tortoise TTS for splitting:
+
+```python
+from tortoise.utils.text import split_and_recombine_text
+import numpy as np
+from scipy.io.wavfile import write
+import msinference
+text = 'Long text here...'
+texts = split_and_recombine_text(text)
+audios = []
+voice = msinference.compute_style('voice.wav')
+for t in progress.tqdm(texts):
+    audios.append(styletts2importable.inference(t, voice, alpha=0.3, beta=0.7, diffusion_steps=7, embedding_scale=1))
+write('result.wav', 24000, np.concatenate(audios))
+```
+
+## GUI
+
+You can run inference (finetuning coming soon) on a GUI based on the [online demo](https://huggingface.co/spaces/styletts2/styletts2) powered by Gradio.
+
+```bash
+python app.py
+```
+
+**NOTE: Only the multi-speaker tab supports long-text currently.**
+
+Note: the online demo will be updated more frequently as changes are pushed directly to it (rather than through PRs). If you would like to use the latest (potentially unstable) version, use Docker:
+
+```bash
+docker run -it -p 7860:7860 --platform=linux/amd64 --gpus all registry.hf.space/styletts2-styletts2:latest python app.py
+```
+
 ## Training
 First stage training:
 ```bash
