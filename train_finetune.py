@@ -498,16 +498,6 @@ def main(config_path):
                     # SLM generator loss
                     optimizer.zero_grad()
                     loss_gen_lm.backward()
-                    optimizer.step('bert_encoder')
-                    optimizer.step('bert')
-                    optimizer.step('predictor')
-                    optimizer.step('diffusion')
-
-                    # SLM discriminator loss
-                    if d_loss_slm != 0:
-                        optimizer.zero_grad()
-                        d_loss_slm.backward(retain_graph=True)
-                        optimizer.step('wd')
 
                     # compute the gradient norm
                     total_norm = {}
@@ -537,6 +527,17 @@ def main(config_path):
                     for p in model.diffusion.parameters():
                         if p.grad is not None:
                             p.grad *= slmadv_params.scale
+                    
+                    optimizer.step('bert_encoder')
+                    optimizer.step('bert')
+                    optimizer.step('predictor')
+                    optimizer.step('diffusion')
+
+                    # SLM discriminator loss
+                    if d_loss_slm != 0:
+                        optimizer.zero_grad()
+                        d_loss_slm.backward(retain_graph=True)
+                        optimizer.step('wd')
 
             iters = iters + 1
             
