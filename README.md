@@ -84,8 +84,7 @@ Please make sure you have the LibriTTS checkpoint downloaded and unzipped under 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yl4579/StyleTTS2/blob/main/Colab/StyleTTS2_Finetune_Demo.ipynb)
 
 ### Common Issues
-- **Out of memory after `joint_epoch`**: This is likely because your GPU RAM is not big enough for SLM adversarial training run. You may skip that but the quailty could be worse. Setting `joint_epoch` a larger number than `epochs` could skip the SLM advesariral training.
-- **`Kernel size can't be greater than actual input size`**: This is because of the receptive field of style encoder and it cannot encode speech less than one second. Please make sure your `max_len` is at least 80 (one second), and your training set has NO samples shorter than 1 second. You can refer to issues [#48](https://github.com/yl4579/StyleTTS2/issues/48) and [#80](https://github.com/yl4579/StyleTTS2/issues/80) for more details.
+[@Kreevoz](https://github.com/Kreevoz) has made detailed notes on common issues in finetuning, with suggestions in maximizing audio quality: [#81](https://github.com/yl4579/StyleTTS2/discussions/81). Some of these also apply to training from scratch. 
 
 ## Inference
 Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) (single-speaker) and [Inference_LibriTTS.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LibriTTS.ipynb) (multi-speaker) for details. For LibriTTS, you will also need to download [reference_audio.zip](https://huggingface.co/yl4579/StyleTTS2-LibriTTS/resolve/main/reference_audio.zip) and unzip it under the `demo` before running the demo. 
