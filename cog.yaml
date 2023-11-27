@@ -1,0 +1,33 @@
+# Configuration for Cog ⚙️
+# Reference: https://github.com/replicate/cog/blob/main/docs/yaml.md
+
+build:
+  cuda: "12.1"
+  gpu: true
+  system_packages:
+    - "espeak-ng"
+    - "ffmpeg"
+  python_version: "3.9"
+  python_packages:
+    - "numpy==1.26.2"
+    - "torch==2.1.1"
+    - "torchvision==0.16.1"
+    - "SoundFile==0.12.1"
+    - "torchaudio==2.1.1"
+    - "munch==4.0.0"
+    - "pydub"
+    - "librosa==0.10.1"
+    - "nltk==3.8.1"
+    - "matplotlib"
+    - "accelerate==0.24.1"
+    - "transformers==4.35.2"
+    - "einops==0.7.0"
+    - "einops-exts"
+    - "tqdm==4.66.1"
+    - "phonemizer==3.2.1"
+    - "typing"
+    - "typing-extensions"
+    - "ipython==8.17.2"
+    - "git+https://github.com/resemble-ai/monotonic_align.git"
+predict: "predict.py:Predictor"
+
