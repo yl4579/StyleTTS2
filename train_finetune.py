@@ -243,8 +243,8 @@ def main(config_path):
                                 sig=slmadv_params.sig
                                )
 
-    model, optimizer, train_dataloader = accelerator.prepare(
-        model, optimizer, train_dataloader
+    model, optimizer, train_dataloader, val_dataloader, text_aligner, pitch_extractor, plbert = accelerator.prepare(
+        model, optimizer, train_dataloader, val_dataloader, load_ASR_models, pitch_extractor, plbert
     )
 
     for epoch in range(start_epoch, epochs):
