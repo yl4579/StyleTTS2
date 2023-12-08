@@ -93,7 +93,7 @@ class FilePathDataset(torch.utils.data.Dataset):
         self.max_mel_length = 192
         
         self.min_length = min_length
-        with open(OOD_data, 'r') as f:
+        with open(OOD_data, 'r', encoding='utf-8') as f:
             tl = f.readlines()
         idx = 1 if '.wav' in tl[0].split('|')[0] else 0
         self.ptexts = [t.split('|')[idx] for t in tl]
