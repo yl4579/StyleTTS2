@@ -11,6 +11,7 @@ import torchaudio
 import librosa
 import click
 import shutil
+import traceback
 import warnings
 warnings.simplefilter('ignore')
 from torch.utils.tensorboard import SummaryWriter
@@ -669,7 +670,9 @@ def main(config_path):
                     loss_f += (loss_F0).mean()
 
                     iters_test += 1
-                except:
+                except Exception as e:
+                    print(f"run into exception", e)
+                    traceback.print_exc()
                     continue
 
         print('Epochs:', epoch + 1)
