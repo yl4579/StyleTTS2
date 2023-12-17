@@ -93,6 +93,40 @@ accelerate launch --mixed_precision=fp16 --num_processes=1 train_finetune_accele
 - **Out of memory after `joint_epoch`**: This is likely because your GPU RAM is not big enough for SLM adversarial training run. You may skip that but the quality could be worse. Setting `joint_epoch` a larger number than `epochs` could skip the SLM advesariral training.
 
 ## Inference
+
+Quick start example:
+
+```python
+from styletts2 import TTS
+import sounddevice as sd
+import phonemizer
+
+tts = TTS.load_model(
+    config_path="hf://yl4579/StyleTTS2-LibriTTS/Models/LibriTTS/config.yml",
+    checkpoint_path="hf://yl4579/StyleTTS2-LibriTTS/Models/LibriTTS/epochs_2nd_00020.pth"
+)
+
+es_phonemizer = phonemizer.backend.EspeakBackend(
+    language='en-us',
+    preserve_punctuation=True,
+    with_stress=True
+)
+
+style = tts.compute_style('../tts-server/tts_server/voices/en-f-1.wav')
+
+wav, _ = tts.inference(
+    "This is a text! Hello world! How are you? What's your name?", 
+    style,
+    phonemizer=es_phonemizer,
+    alpha=0.3,
+    beta=0.7,
+    diffusion_steps=10,
+    embedding_scale=2)
+
+sd.play(wav, 24000)
+sd.wait()
+```
+
 Please refer to [Inference_LJSpeech.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LJSpeech.ipynb) (single-speaker) and [Inference_LibriTTS.ipynb](https://github.com/yl4579/StyleTTS2/blob/main/Demo/Inference_LibriTTS.ipynb) (multi-speaker) for details. For LibriTTS, you will also need to download [reference_audio.zip](https://huggingface.co/yl4579/StyleTTS2-LibriTTS/resolve/main/reference_audio.zip) and unzip it under the `demo` before running the demo. 
 
 - The pretrained StyleTTS 2 on LJSpeech corpus in 24 kHz can be downloaded at [https://huggingface.co/yl4579/StyleTTS2-LJSpeech/tree/main](https://huggingface.co/yl4579/StyleTTS2-LJSpeech/tree/main).

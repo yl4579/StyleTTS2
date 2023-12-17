@@ -71,4 +71,3 @@ def recursive_munch(d):
 def log_print(message, logger):
     logger.info(message)
     print(message)
-    
