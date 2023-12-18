@@ -1,10 +1,9 @@
 from math import atan, cos, pi, sin, sqrt
 from typing import Any, Callable, List, Optional, Tuple, Type
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from einops import rearrange, reduce
+from einops import rearrange
 from torch import Tensor
 
 from .utils import *

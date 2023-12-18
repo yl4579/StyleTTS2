@@ -1,12 +1,4 @@
-from math import pi
-from random import randint
-from typing import Any, Optional, Sequence, Tuple, Union
-
-import torch
-from einops import rearrange
 from torch import Tensor, nn
-from tqdm import tqdm
-
 from .utils import *
 from .sampler import *
 
@@ -90,5 +82,3 @@ class AudioDiffusionConditional(Model1d):
             embedding_scale=5.0,
         )
         return super().sample(*args, **{**default_kwargs, **kwargs})
-
-
