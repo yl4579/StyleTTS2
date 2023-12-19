@@ -311,8 +311,8 @@ def main(config_path):
                 s = model.style_encoder(mel.unsqueeze(0).unsqueeze(1))
                 gs.append(s)
 
-            s_dur = torch.stack(ss).squeeze()  # global prosodic styles
-            gs = torch.stack(gs).squeeze() # global acoustic styles
+            s_dur = torch.stack(ss).squeeze(1)  # global prosodic styles
+            gs = torch.stack(gs).squeeze(1) # global acoustic styles
             s_trg = torch.cat([gs, s_dur], dim=-1).detach() # ground truth for denoiser
 
             bert_dur = model.bert(texts, attention_mask=(~text_mask).int())
@@ -395,7 +395,7 @@ def main(config_path):
                 
             with torch.no_grad():
                 F0_real, _, F0 = model.pitch_extractor(gt.unsqueeze(1))
-                F0 = F0.reshape(F0.shape[0], F0.shape[1] * 2, F0.shape[2], 1).squeeze()
+                F0 = F0.reshape(F0.shape[0], F0.shape[1] * 2, F0.shape[2])
 
                 N_real = log_norm(gt.unsqueeze(1)).squeeze(1)
                 
@@ -422,7 +422,7 @@ def main(config_path):
 
             loss_mel = stft_loss(y_rec, wav)
             loss_gen_all = gl(wav, y_rec).mean()
-            loss_lm = wl(wav.detach().squeeze(), y_rec.squeeze()).mean()
+            loss_lm = wl(wav.detach().squeeze(1), y_rec.squeeze(1)).mean()
 
             loss_ce = 0
             loss_dur = 0
