@@ -21,10 +21,10 @@ import torch.nn.functional as F
 import torchaudio
 import librosa
 
-from models import *
+from styletts2.models import *
 from meldataset import build_dataloader
-from utils import *
-from losses import *
+from styletts2.utils import *
+from styletts2.losses import *
 from optimizers import build_optimizer
 import time
 
@@ -108,7 +108,7 @@ def main(config_path):
         pitch_extractor = load_F0_models(F0_path)
 
         # load BERT model
-        from Utils.PLBERT.util import load_plbert
+        from styletts2.Utils.PLBERT.util import load_plbert
         BERT_path = config.get('PLBERT_dir', False)
         plbert = load_plbert(BERT_path)
 
