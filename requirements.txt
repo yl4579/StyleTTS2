@@ -1,5 +1,6 @@
 SoundFile
 torchaudio
+torchvision
 munch
 torch
 pydub
@@ -15,3 +16,9 @@ tqdm
 typing
 typing-extensions
 git+https://github.com/resemble-ai/monotonic_align.git
+phonemizer
+
+
+torch --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
+torchvision --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
+torchaudio --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'

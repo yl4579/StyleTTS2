@@ -17,9 +17,36 @@ Online demo: [Hugging Face](https://huggingface.co/spaces/styletts2/styletts2) (
 - [x] Test training code for multi-speaker models (VCTK and LibriTTS)
 - [x] Finish demo code for multispeaker model and upload pre-trained models
 - [x] Add a finetuning script for new speakers with base pre-trained multispeaker models
+- [x] Installable styletts2 and easier interface
+- [ ] Add multilingual support
+- [ ] Add simple interface to train new languages and voice tuning
 - [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))**
 
 ## Pre-requisites
+
+### Install as package
+
+1. Conda new env and lfs (recommended)
+```bash
+conda create -n styletts python=3.9
+conda activate styletts
+git lfs install
+```
+2. Install espeak 
+*Linux*
+```bash
+sudo apt update
+sudo apt install espeak-ng
+```
+*MacOS* build [espeak-ng](https://github.com/espeak-ng/espeak-ng/blob/master/docs/building.md)
+*windows* install [espeak-ng](https://github.com/espeak-ng/espeak-ng/blob/master/docs/guide.md#windows)
+
+3. install requirements
+```bash
+pip install -r requirements.txt
+```
+
+### If you want to edit the code while development
 1. Python >= 3.7
 2. Clone this repository:
 ```bash
@@ -29,10 +56,6 @@ cd StyleTTS2
 3. Install python requirements: 
 ```bash
 pip install -r requirements.txt
-```
-On Windows add:
-```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 -U
 ```
 Also install phonemizer and espeak if you want to run the demo:
 ```bash
