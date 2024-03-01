@@ -1,6 +1,6 @@
-include **/*.yml
-include **/*.yaml
-include **/*.json
-include **/*.pth
-include **/*.t7
-include **/*.txt
+global-include *.yml
+global-include *.yaml
+global-include *.json
+global-include *.pth
+global-include *.t7
+global-include *.txt
