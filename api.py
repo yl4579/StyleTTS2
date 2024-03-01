@@ -31,8 +31,14 @@ from .Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSch
 from typing import Tuple, Type, Union
 from numpy.typing import NDArray
 import os
+
+# runs first time after installation only
 import nltk
 nltk.download('punkt')
+
+
+import pathlib
+ROOT = pathlib.Path(__file__).parent.resolve()
 
 
 def load_phonemizer_configs_asr_f0_bert(language:str="en-us", 
@@ -41,7 +47,7 @@ def load_phonemizer_configs_asr_f0_bert(language:str="en-us",
     global_phonemizer = phonemizer.backend.EspeakBackend(language=language, preserve_punctuation=True,  with_stress=True)
     
     if add_cwd is True:
-        config_path = os.path.join(os.getcwd(), config_path)
+        config_path = os.path.join(ROOT, config_path)
     config = yaml.safe_load(open(config_path))
 
 
@@ -49,19 +55,19 @@ def load_phonemizer_configs_asr_f0_bert(language:str="en-us",
     ASR_config = config.get('ASR_config', False)
     ASR_path = config.get('ASR_path', False)
     if add_cwd is True:
-        ASR_path = os.path.join(os.getcwd(), ASR_path)
+        ASR_path = os.path.join(ROOT, ASR_path)
     text_aligner = load_ASR_models(ASR_path, ASR_config)
 
     # load pretrained F0 model
     F0_path = config.get('F0_path', False)
     if add_cwd is True:
-        F0_path = os.path.join(os.getcwd(), F0_path)
+        F0_path = os.path.join(ROOT, F0_path)
     pitch_extractor = load_F0_models(F0_path)
 
     # load BERT model
     BERT_path = config.get('PLBERT_dir', False)
     if add_cwd is True:
-        BERT_path = os.path.join(os.getcwd(), BERT_path)
+        BERT_path = os.path.join(ROOT, BERT_path)
     plbert = load_plbert(BERT_path)
 
     return global_phonemizer, config, text_aligner, pitch_extractor, plbert
@@ -122,8 +128,8 @@ class StyleTTS:
 
         if load_from_HF is True:
             if model_path is None: 
-                cwd = os.getcwd()
-                model_path = os.path.join(cwd,"models_weight")
+                
+                model_path = os.path.join(ROOT,"models_weight")
                 if not os.path.exists(model_path):
                     os.makedirs(model_path, exist_ok=True)
                     os.system(f"git clone {model_remote_path} {model_path}")
