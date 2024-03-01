@@ -56,6 +56,7 @@ def load_phonemizer_configs_asr_f0_bert(language:str="en-us",
     ASR_path = config.get('ASR_path', False)
     if add_cwd is True:
         ASR_path = os.path.join(ROOT, ASR_path)
+        ASR_config = os.path.join(ROOT, ASR_config)
     text_aligner = load_ASR_models(ASR_path, ASR_config)
 
     # load pretrained F0 model
