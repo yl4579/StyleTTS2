@@ -35,23 +35,33 @@ import nltk
 nltk.download('punkt')
 
 
-def load_phonemizer_configs_asr_f0_bert(language:str="en-us", config_path:str="./Configs/config.yml")->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
+def load_phonemizer_configs_asr_f0_bert(language:str="en-us", 
+                                        config_path:str="./Configs/config.yml",
+                                        add_cwd:bool=True)->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
     global_phonemizer = phonemizer.backend.EspeakBackend(language=language, preserve_punctuation=True,  with_stress=True)
-
+    
+    if add_cwd is True:
+        config_path = os.path.join(os.getcwd(), config_path)
     config = yaml.safe_load(open(config_path))
 
 
     # load pretrained ASR model
     ASR_config = config.get('ASR_config', False)
     ASR_path = config.get('ASR_path', False)
+    if add_cwd is True:
+        ASR_path = os.path.join(os.getcwd(), ASR_path)
     text_aligner = load_ASR_models(ASR_path, ASR_config)
 
     # load pretrained F0 model
     F0_path = config.get('F0_path', False)
+    if add_cwd is True:
+        F0_path = os.path.join(os.getcwd(), F0_path)
     pitch_extractor = load_F0_models(F0_path)
 
     # load BERT model
     BERT_path = config.get('PLBERT_dir', False)
+    if add_cwd is True:
+        BERT_path = os.path.join(os.getcwd(), BERT_path)
     plbert = load_plbert(BERT_path)
 
     return global_phonemizer, config, text_aligner, pitch_extractor, plbert
@@ -100,13 +110,16 @@ def load_sampler(model:torch.nn.Module)->torch.nn.Module:
 
 class StyleTTS:
     def __init__(self, 
-                 config_path:str="./Configs/config.yml", 
+                 config_path:str=None, 
                  model_path:str=None, 
                  language:str="en-us", 
                  device:str='cpu',
                  load_from_HF:bool=True, 
                  model_remote_path:str="https://huggingface.co/yl4579/StyleTTS2-LibriTTS"):
         
+        add_cwd = False
+        if config_path is None: add_cwd = True
+
         if load_from_HF is True:
             if model_path is None: 
                 cwd = os.getcwd()
@@ -114,7 +127,7 @@ class StyleTTS:
                 if not os.path.exists(model_path):
                     os.makedirs(model_path, exist_ok=True)
                     os.system(f"git clone {model_remote_path} {model_path}")
-                config_path = os.path.join(model_path, "Models", "LibriTTS", "config.yml")
+                config_path = os.path.join("Models", "LibriTTS", "config.yml")
                 model_path = os.path.join(model_path, "Models", "LibriTTS", "epochs_2nd_00020.pth")
 
         self.model_remote_path = model_remote_path
@@ -127,7 +140,9 @@ class StyleTTS:
          self.config, 
          self.text_aligner, 
          self.pitch_extractor, 
-         self.plbert) = load_phonemizer_configs_asr_f0_bert(language=language, config_path=self.config_path)
+         self.plbert) = load_phonemizer_configs_asr_f0_bert(language=language, 
+                                                            config_path=self.config_path, 
+                                                            add_cwd=add_cwd)
         
 
         self.model, self.model_params = load_model(weight_path=model_path, 
