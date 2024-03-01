@@ -28,15 +28,15 @@ from text_utils import TextCleaner
 import phonemizer
 from Utils.PLBERT.util import load_plbert
 from Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
-from typing import Tuple, Type
+from typing import Tuple, Type, Union
 from numpy.typing import NDArray
 import os
 
 
-def load_phonemizer_configs_asr_f0_bert(language:str="en-us")->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
+def load_phonemizer_configs_asr_f0_bert(language:str="en-us", config_path:str="./Configs/config.yml")->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
     global_phonemizer = phonemizer.backend.EspeakBackend(language=language, preserve_punctuation=True,  with_stress=True)
 
-    config = yaml.safe_load(open("/content/StyleTTS2/StyleTTS2-LibriTTS/Models/LibriTTS/config.yml"))
+    config = yaml.safe_load(open(config_path))
 
 
     # load pretrained ASR model
@@ -111,6 +111,8 @@ class StyleTTS:
                 model_path = os.path.join(cwd,"models_weight")
                 os.makedirs(model_path, exist_ok=True)
             os.system(f"git clone {model_remote_path} {model_path}")
+            config_path = os.path.join(model_path, "Models", "LibriTTS", "config.yml")
+            model_path = os.path.join(model_path, "Models", "LibriTTS", "epochs_2nd_00020.pth")
 
         self.model_remote_path = model_remote_path
         self.config_path = config_path
@@ -122,7 +124,7 @@ class StyleTTS:
          self.config, 
          self.text_aligner, 
          self.pitch_extractor, 
-         self.plbert) = load_phonemizer_configs_asr_f0_bert(language=language)
+         self.plbert) = load_phonemizer_configs_asr_f0_bert(language=language, config_path=self.config_path)
         
 
         self.model, self.model_params = load_model(weight_path=model_path, 
@@ -140,17 +142,20 @@ class StyleTTS:
             n_mels=80, n_fft=2048, win_length=1200, hop_length=300)
         self.mean, self.std = -4, 4
 
-    # def __call__(self, text:str, ref_s:NDArray, alpha:float=0.3, 
-    #              beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
-    #     return self.predict(text=text,
-    #                         ref_s=ref_s, 
-    #                         alpha=alpha, 
-    #                         beta=beta, 
-    #                         diffusion_steps=diffusion_steps, 
-    #                         embedding_scale=embedding_scale)
+    def __call__(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
+                 beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
+        return self.predict(text=text, 
+                            ref_s=ref_s, 
+                            alpha=alpha, 
+                            beta=beta, 
+                            diffusion_steps=diffusion_steps, 
+                            embedding_scale=embedding_scale)
 
-    def predict(self, text:str, ref_s:NDArray, alpha:float=0.3, 
+    def predict(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
                 beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
+        
+        if ref_s is None: ref_s = self.load_random_ref_s()
+
         text = text.strip()
         ps = self.global_phonemizer.phonemize([text])
         ps = word_tokenize(ps[0])
@@ -242,9 +247,10 @@ class StyleTTS:
         mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - self.mean) / self.std
         return mel_tensor
 
-    def _predict_long_step(self, text:str, s_prev:NDArray, ref_s:NDArray, 
+    def _predict_long_step(self, text:str, s_prev:NDArray, ref_s:NDArray=None, 
                            alpha:float=0.3, beta:float=0.7, t:float=0.7, 
                            diffusion_steps:int=5, embedding_scale:int=1)->NDArray:
+        if ref_s is None: ref_s = self.load_random_ref_s()
         text = text.strip()
         ps = self.global_phonemizer.phonemize([text])
         ps = word_tokenize(ps[0])
@@ -320,9 +326,10 @@ class StyleTTS:
 
         return out.squeeze().cpu().numpy()[..., :-100], s_pred # weird pulse at the end of the model, need to be fixed later
     
-    def predict_long(self, text:str, ref_s:NDArray, alpha:float=0.3, 
+    def predict_long(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
                      beta:float=0.7, diffusion_steps:float=5, 
                      embedding_scale:float=1, t:float=.7) -> NDArray:
+        if ref_s is None: ref_s = self.load_random_ref_s()
         sentences = text.split('.') # simple split by dot (what about split_and_recombine_text tortoise. I'll check it out later)
         wavs = []
         s_prev = None
@@ -340,6 +347,9 @@ class StyleTTS:
                                                   embedding_scale=embedding_scale)
             wavs.append(wav)
 
+    def load_random_ref_s(self):
+        return torch.randn(1, 256).to(self._device)
+    
     @property
     def device(self):
         return self._device
@@ -355,6 +365,11 @@ class StyleTTS:
 if __name__ == "__main__":
     print(StyleTTS)
     stts = StyleTTS()
-
+    sr = 24000
+    wave = np.random.randn(sr*10)
+    # print(wave.shape)
+    # print(stts.compute_style(wave=wave, sr=sr, path=None, device='cpu').shape)
+    # print(stts.load_random_ref_s().shape)
+    assert stts("read this in a random voice") is not None
 
     
