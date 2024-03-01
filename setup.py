@@ -10,10 +10,15 @@ setup(
    version='2.0',
    description='A text-to-speech (TTS) model that leverages style diffusion and adversarial training with large speech language models (SLMs) to achieve human-level TTS synthesis.',
    license='MIT',
+   packages=find_packages(),
    package_dir={'styletts2':'./'},
    long_description=open('README.md').read(),
    install_requires=required,
    url="https://github.com/yl4579/StyleTTS2.git",
    include_package_data=True,
+    # package_data = {
+    #     'static': ['*'],
+    #     'Potato': ['*.txt']
+    # }
    
 )
