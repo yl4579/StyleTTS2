@@ -43,7 +43,7 @@ sudo apt install espeak-ng
 
 3. install requirements
 ```bash
-pip install -r requirements.txt
+pip install git+https://github.com/yl4579/StyleTTS2.git
 ```
 
 ### If you want to edit the code while development
