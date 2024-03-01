@@ -133,7 +133,7 @@ class StyleTTS:
                 if not os.path.exists(model_path):
                     os.makedirs(model_path, exist_ok=True)
                     os.system(f"git clone {model_remote_path} {model_path}")
-                config_path = os.path.join("Models", "LibriTTS", "config.yml")
+                config_path = os.path.join("models_weight", "Models", "LibriTTS", "config.yml")
                 model_path = os.path.join(model_path, "Models", "LibriTTS", "epochs_2nd_00020.pth")
 
         self.model_remote_path = model_remote_path
