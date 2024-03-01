@@ -625,7 +625,11 @@ def build_model(args, text_aligner, pitch_extractor, bert):
     assert args.decoder.type in ['istftnet', 'hifigan'], 'Decoder type unknown'
     
     if args.decoder.type == "istftnet":
-        from Modules.istftnet import Decoder
+        try:
+            from .Modules.istftnet import Decoder
+        except:
+            from Modules.istftnet import Decoder
+
         decoder = Decoder(dim_in=args.hidden_dim, style_dim=args.style_dim, dim_out=args.n_mels,
                 resblock_kernel_sizes = args.decoder.resblock_kernel_sizes,
                 upsample_rates = args.decoder.upsample_rates,
@@ -634,7 +638,10 @@ def build_model(args, text_aligner, pitch_extractor, bert):
                 upsample_kernel_sizes=args.decoder.upsample_kernel_sizes, 
                 gen_istft_n_fft=args.decoder.gen_istft_n_fft, gen_istft_hop_size=args.decoder.gen_istft_hop_size) 
     else:
-        from Modules.hifigan import Decoder
+        try:
+            from .Modules.hifigan import Decoder
+        except:
+            from Modules.hifigan import Decoder
         decoder = Decoder(dim_in=args.hidden_dim, style_dim=args.style_dim, dim_out=args.n_mels,
                 resblock_kernel_sizes = args.decoder.resblock_kernel_sizes,
                 upsample_rates = args.decoder.upsample_rates,
