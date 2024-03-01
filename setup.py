@@ -1,15 +1,21 @@
 import os
 from setuptools import setup, find_packages
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 
 setup(
    name='StyleTTS2',
    version='2.0',
    description='A text-to-speech (TTS) model that leverages style diffusion and adversarial training with large speech language models (SLMs) to achieve human-level TTS synthesis.',
    license='MIT',
-   package_dir={'styletts2':'./'},
+   package_dir={'styletts2':'src'},
    long_description=open('README.md').read(),
-   packages=find_packages(),
-   install_requires=find_packages(),
+   install_requires=required,
    url="https://github.com/yl4579/StyleTTS2.git",
+   scripts=[
+            './scripts/nltk_download',
+            './scripts/cli',
+            ],
 )
