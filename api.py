@@ -226,7 +226,9 @@ class StyleTTS:
                 alpha (float, optional): The weight of the reference style in the generated speech. Defaults to 0.3.
                 beta (float, optional): The weight of the input text in the generated speech. Defaults to 0.7.
                 diffusion_steps (float, optional): The number of diffusion steps for speech generation. Defaults to 5.
-                embedding_scale (float, optional): The scale factor for the input text embedding. Defaults to 1.
+                embedding_scale (float, optional): The scale factor for the input text embedding. This is the classifier-free guidance scale. 
+                                                    The higher the scale, the more conditional the style is to the input text and hence more emotional. 
+                                                    Defaults to 1.
 
             Returns:
                 NDArray: The generated speech waveform.
@@ -249,7 +251,9 @@ class StyleTTS:
             alpha (float, optional): Alpha value for controlling timbr. Defaults to 0.3 (70% of the reference timbre).
             beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
             diffusion_steps (float, optional): Number of diffusion steps for sampling the speech. Defaults to 5.
-            embedding_scale (float, optional): Scaling factor for the speaker embedding. Defaults to 1.
+            embedding_scale (float, optional): The scale factor for the input text embedding. This is the classifier-free guidance scale. 
+                                                    The higher the scale, the more conditional the style is to the input text and hence more emotional. 
+                                                    Defaults to 1.
 
         Returns:
             NDArray: The generated speech waveform.
@@ -372,7 +376,7 @@ class StyleTTS:
 
     def predict_long_step(self, text:str, s_prev:NDArray, ref_s:NDArray=None, 
                            alpha:float=0.3, beta:float=0.7, t:float=0.7, 
-                           diffusion_steps:int=5, embedding_scale:int=1)->NDArray:
+                           diffusion_steps:int=5, embedding_scale:float=1)->NDArray:
         """
             Predicts the output audio waveform for a given input text and style.
 
@@ -384,7 +388,9 @@ class StyleTTS:
                 beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
                 t (float, optional): The convex combination factor between the previous and current style. Defaults to 0.7.
                 diffusion_steps (int, optional): The number of diffusion steps. Defaults to 5.
-                embedding_scale (int, optional): The scale factor for the style embedding. Defaults to 1.
+                embedding_scale (float, optional): The scale factor for the input text embedding. This is the classifier-free guidance scale. 
+                                                    The higher the scale, the more conditional the style is to the input text and hence more emotional. 
+                                                    Defaults to 1.
 
             Returns:
                 NDArray: The output audio waveform.
@@ -481,7 +487,9 @@ class StyleTTS:
             beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
             t (float, optional): The convex combination factor between the previous and current style. Defaults to 0.7.
             diffusion_steps (int, optional): The number of diffusion steps. Defaults to 5.
-            embedding_scale (int, optional): The scale factor for the style embedding. Defaults to 1.
+            embedding_scale (float, optional): The scale factor for the input text embedding. This is the classifier-free guidance scale. 
+                                                    The higher the scale, the more conditional the style is to the input text and hence more emotional. 
+                                                    Defaults to 1.
 
         Returns:
             NDArray: The generated audio waveform as a numpy array.
