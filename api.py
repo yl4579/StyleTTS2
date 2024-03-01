@@ -1,3 +1,6 @@
+"""
+StyleTTS2 API module.
+"""
 import torch
 torch.manual_seed(0)
 torch.backends.cudnn.benchmark = False
@@ -44,6 +47,18 @@ ROOT = pathlib.Path(__file__).parent.resolve()
 def load_phonemizer_configs_asr_f0_bert(language:str="en-us", 
                                         config_path:str="./Configs/config.yml",
                                         add_cwd:bool=True)->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
+    """
+    Load the necessary configurations and models for phonemizer, ASR, F0, and BERT.
+
+    Args:
+        language (str, optional): The language for the phonemizer backend. Defaults to "en-us".
+        config_path (str, optional): The path to the configuration file. Defaults to "./Configs/config.yml".
+        add_cwd (bool, optional): Whether to add the current working directory to the paths. This is used to load default models only.  Defaults to True.
+
+    Returns:
+        Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]: A tuple containing the global phonemizer,
+        the configuration dictionary, the text aligner model, the pitch extractor model, and the BERT model.
+    """
     global_phonemizer = phonemizer.backend.EspeakBackend(language=language, preserve_punctuation=True,  with_stress=True)
     
     if add_cwd is True:
@@ -75,7 +90,21 @@ def load_phonemizer_configs_asr_f0_bert(language:str="en-us",
 
 def load_model(weight_path:str, config:dict, 
                text_aligner:torch.nn.Module, pitch_extractor:torch.nn.Module,
-                 plbert:torch.nn.Module, device:str='cpu')->Tuple[torch.nn.Module, any]:
+               plbert:torch.nn.Module, device:str='cpu')->Tuple[torch.nn.Module, any]:
+    """
+    Loads a pre-trained model with the specified weight path and configuration.
+
+    Args:
+        weight_path (str): The path to the pre-trained model weights.
+        config (dict): The configuration dictionary for building the model.
+        text_aligner (torch.nn.Module): The text aligner module. Returned by load_phonemizer_configs_asr_f0_bert.
+        pitch_extractor (torch.nn.Module): The pitch extractor module. Returned by load_phonemizer_configs_asr_f0_bert.
+        plbert (torch.nn.Module): The plbert module. Returned by load_phonemizer_configs_asr_f0_bert.
+        device (str, optional): The device to load the model on. Defaults to 'cpu'.
+
+    Returns:
+        Tuple[torch.nn.Module, any]: A tuple containing the loaded model and its parameters.
+    """
     model_params = recursive_munch(config['model_params'])
     model = build_model(model_params, text_aligner, pitch_extractor, plbert)
     _ = [model[key].eval() for key in model]
@@ -106,7 +135,16 @@ def load_model(weight_path:str, config:dict,
 
     return model, model_params
 
-def load_sampler(model:torch.nn.Module)->torch.nn.Module:
+def load_sampler(model: torch.nn.Module) -> torch.nn.Module:
+    """
+    Loads a diffusion sampler for the given model.
+
+    Args:
+        model (torch.nn.Module): The model to load the sampler for. Returned by load_model.
+
+    Returns:
+        torch.nn.Module: The loaded diffusion sampler.
+    """
     sampler = DiffusionSampler(model.diffusion.diffusion,
                                sampler=ADPM2Sampler(),
                                sigma_schedule=KarrasSchedule(sigma_min=0.0001, sigma_max=3.0, rho=9.0), # empirical parameters
@@ -123,7 +161,17 @@ class StyleTTS:
                  device:str='cpu',
                  load_from_HF:bool=True, 
                  model_remote_path:str="https://huggingface.co/yl4579/StyleTTS2-LibriTTS"):
-        
+        """
+        Initializes the API object for StyleTTS2.
+
+        Args:
+            config_path (str, optional): Path to the configuration file. Defaults to None.
+            model_path (str, optional): Path to the model file. Defaults to None. If None, will use LJ Speech model.
+            language (str, optional): Language code. Defaults to "en-us". More languages will be added in the future with multi language plbert.
+            device (str, optional): Device to run the model on. Defaults to 'cpu'.
+            load_from_HF (bool, optional): Whether to load the model from Hugging Face. Defaults to True.
+            model_remote_path (str, optional): Remote path to the model. Defaults to "https://huggingface.co/yl4579/StyleTTS2-LibriTTS".
+        """
         add_cwd = False
         if config_path is None: add_cwd = True
 
@@ -150,7 +198,7 @@ class StyleTTS:
          self.plbert) = load_phonemizer_configs_asr_f0_bert(language=language, 
                                                             config_path=self.config_path, 
                                                             add_cwd=add_cwd)
-        
+
 
         self.model, self.model_params = load_model(weight_path=model_path, 
                                                    config=self.config, 
@@ -168,16 +216,44 @@ class StyleTTS:
         self.mean, self.std = -4, 4
 
     def __call__(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
-                 beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
-        return self.predict(text=text, 
-                            ref_s=ref_s, 
-                            alpha=alpha, 
-                            beta=beta, 
-                            diffusion_steps=diffusion_steps, 
-                            embedding_scale=embedding_scale)
+                     beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
+            """
+            Call the model to generate speech with the given input text and optional reference style. wrapper for predict.
+
+            Args:
+                text (str): The input text for speech generation.
+                ref_s (NDArray, optional): The reference style for speech generation. Defaults to None.
+                alpha (float, optional): The weight of the reference style in the generated speech. Defaults to 0.3.
+                beta (float, optional): The weight of the input text in the generated speech. Defaults to 0.7.
+                diffusion_steps (float, optional): The number of diffusion steps for speech generation. Defaults to 5.
+                embedding_scale (float, optional): The scale factor for the input text embedding. Defaults to 1.
+
+            Returns:
+                NDArray: The generated speech waveform.
+            """
+            return self.predict(text=text, 
+                                ref_s=ref_s, 
+                                alpha=alpha, 
+                                beta=beta, 
+                                diffusion_steps=diffusion_steps, 
+                                embedding_scale=embedding_scale)
 
     def predict(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
-                beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
+                    beta:float=0.7, diffusion_steps:float=5, embedding_scale:float=1) -> NDArray:
+        """
+        Generates speech waveform for the given input text.
+
+        Args:
+            text (str): The input text to be synthesized.
+            ref_s (NDArray, optional): Reference speaker embedding. Returned by compute_style. Defaults to None.
+            alpha (float, optional): Alpha value for controlling timbr. Defaults to 0.3 (70% of the reference timbre).
+            beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
+            diffusion_steps (float, optional): Number of diffusion steps for sampling the speech. Defaults to 5.
+            embedding_scale (float, optional): Scaling factor for the speaker embedding. Defaults to 1.
+
+        Returns:
+            NDArray: The generated speech waveform.
+        """
         
         if ref_s is None: ref_s = self.load_random_ref_s()
 
@@ -198,10 +274,10 @@ class StyleTTS:
             d_en = self.model.bert_encoder(bert_dur).transpose(-1, -2)
 
             s_pred = self.sampler(noise = torch.randn((1, 256)).unsqueeze(1).to(self._device),
-                                  embedding=bert_dur,
-                                  embedding_scale=embedding_scale,
-                                  features=ref_s, # reference from the same speaker as the embedding
-                                  num_steps=diffusion_steps).squeeze(1)
+                                    embedding=bert_dur,
+                                    embedding_scale=embedding_scale,
+                                    features=ref_s, # reference from the same speaker as the embedding
+                                    num_steps=diffusion_steps).squeeze(1)
 
 
             s = s_pred[:, 128:]
@@ -245,9 +321,22 @@ class StyleTTS:
             out = self.model.decoder(asr, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
 
-        return out.squeeze().cpu().numpy()[..., :-50] # weird pulse at the end of the model, need to be fixed later 
+        return out.squeeze().cpu().numpy()[..., :-50] # weird pulse at the end of the model, need to be fixed later
 
     def compute_style(self, wave=None, sr=None, path=None, device='cpu')->torch.Tensor:
+        """
+        Compute the style representation for the given audio. If path is provided, it will load the audio from the path.
+        Otherwise, it will use the wave and sr arguments.
+
+        Args:
+            wave (np.ndarray, optional): Audio waveform. Defaults to None.
+            sr (int, optional): Sample rate of the audio. Defaults to None.
+            path (str, optional): Path to the audio file. Defaults to None.
+            device (str, optional): Device to use for computation. Defaults to 'cpu'.
+
+        Returns:
+            torch.Tensor: Style representation tensor.
+        """
         if path is not None:
             wave, sr = librosa.load(path, sr=24000)
         audio, index = librosa.effects.trim(wave, top_db=30)
@@ -267,15 +356,43 @@ class StyleTTS:
         return mask
 
     def preprocess(self, wave:NDArray)->torch.Tensor:
+        """
+        Preprocesses the input waveform by converting it to a mel spectrogram tensor.
+
+        Args:
+            wave (numpy.ndarray): The input waveform.
+
+        Returns:
+            torch.Tensor: The preprocessed mel spectrogram tensor.
+        """
         wave_tensor = torch.from_numpy(wave).float()
         mel_tensor = self.to_mel(wave_tensor)
         mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - self.mean) / self.std
         return mel_tensor
 
-    def _predict_long_step(self, text:str, s_prev:NDArray, ref_s:NDArray=None, 
+    def predict_long_step(self, text:str, s_prev:NDArray, ref_s:NDArray=None, 
                            alpha:float=0.3, beta:float=0.7, t:float=0.7, 
                            diffusion_steps:int=5, embedding_scale:int=1)->NDArray:
+        """
+            Predicts the output audio waveform for a given input text and style.
+
+            Args:
+                text (str): The input text to be synthesized.
+                s_prev (NDArray): The previous style embedding.
+                ref_s (NDArray, optional): The reference style embedding. If not provided, a random reference style is loaded. Defaults to None.
+                alpha (float, optional): Alpha value for controlling timbr. Defaults to 0.3 (70% of the reference timbre).
+                beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
+                t (float, optional): The convex combination factor between the previous and current style. Defaults to 0.7.
+                diffusion_steps (int, optional): The number of diffusion steps. Defaults to 5.
+                embedding_scale (int, optional): The scale factor for the style embedding. Defaults to 1.
+
+            Returns:
+                NDArray: The output audio waveform.
+                NDArray: The predicted style embedding.
+        """
+        
         if ref_s is None: ref_s = self.load_random_ref_s()
+        
         text = text.strip()
         ps = self.global_phonemizer.phonemize([text])
         ps = word_tokenize(ps[0])
@@ -354,6 +471,21 @@ class StyleTTS:
     def predict_long(self, text:str, ref_s:NDArray=None, alpha:float=0.3, 
                      beta:float=0.7, diffusion_steps:float=5, 
                      embedding_scale:float=1, t:float=.7) -> NDArray:
+        """
+        Generates a long audio prediction based on the given text.
+
+        Args:
+            text (str): The input text to be synthesized.
+            ref_s (NDArray, optional): The reference style embedding. If not provided, a random reference style is loaded. Defaults to None.
+            alpha (float, optional): Alpha value for controlling timbr. Defaults to 0.3 (70% of the reference timbre).
+            beta (float, optional): Beta value for controlling the prosody. Defaults to 0.7 (30% of the reference prosody).
+            t (float, optional): The convex combination factor between the previous and current style. Defaults to 0.7.
+            diffusion_steps (int, optional): The number of diffusion steps. Defaults to 5.
+            embedding_scale (int, optional): The scale factor for the style embedding. Defaults to 1.
+
+        Returns:
+            NDArray: The generated audio waveform as a numpy array.
+        """
         if ref_s is None: ref_s = self.load_random_ref_s()
         sentences = text.split('.') # simple split by dot (what about split_and_recombine_text tortoise. I'll check it out later)
         wavs = []
@@ -362,7 +494,7 @@ class StyleTTS:
             if text.strip() == "": continue
             text += '.' # add it back
 
-            wav, s_prev = self._predict_long_step(text,
+            wav, s_prev = self.predict_long_step(text,
                                                   s_prev,
                                                   ref_s,
                                                   alpha=alpha,
@@ -375,6 +507,12 @@ class StyleTTS:
         return np.concatenate(wavs, axis=0)
 
     def load_random_ref_s(self):
+        """
+        returns a random style embedding. This ruins the result. Use it only for testing.
+
+        Returns:
+            torch.Tensor: A random style embedding tensor.
+        """
         return torch.randn(1, 256).to(self._device)
     
     @property
