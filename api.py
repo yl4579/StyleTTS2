@@ -31,6 +31,8 @@ from Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSche
 from typing import Tuple, Type, Union
 from numpy.typing import NDArray
 import os
+import nltk
+nltk.download('punkt')
 
 
 def load_phonemizer_configs_asr_f0_bert(language:str="en-us", config_path:str="./Configs/config.yml")->Tuple[any, dict, torch.nn.Module, torch.nn.Module, torch.nn.Module]:
@@ -68,7 +70,7 @@ def load_model(weight_path:str, config:dict,
 
     for key in model:
         if key in params:
-            print('%s loaded' % key)
+            # print('%s loaded' % key)
             try:
                 model[key].load_state_dict(params[key])
             except:
@@ -99,7 +101,7 @@ def load_sampler(model:torch.nn.Module)->torch.nn.Module:
 class StyleTTS:
     def __init__(self, 
                  config_path:str="./Configs/config.yml", 
-                 model_path:str="./models_weight", 
+                 model_path:str=None, 
                  language:str="en-us", 
                  device:str='cpu',
                  load_from_HF:bool=True, 
@@ -109,10 +111,11 @@ class StyleTTS:
             if model_path is None: 
                 cwd = os.getcwd()
                 model_path = os.path.join(cwd,"models_weight")
-                os.makedirs(model_path, exist_ok=True)
-            os.system(f"git clone {model_remote_path} {model_path}")
-            config_path = os.path.join(model_path, "Models", "LibriTTS", "config.yml")
-            model_path = os.path.join(model_path, "Models", "LibriTTS", "epochs_2nd_00020.pth")
+                if not os.path.exists(model_path):
+                    os.makedirs(model_path, exist_ok=True)
+                    os.system(f"git clone {model_remote_path} {model_path}")
+                config_path = os.path.join(model_path, "Models", "LibriTTS", "config.yml")
+                model_path = os.path.join(model_path, "Models", "LibriTTS", "epochs_2nd_00020.pth")
 
         self.model_remote_path = model_remote_path
         self.config_path = config_path
@@ -347,6 +350,8 @@ class StyleTTS:
                                                   embedding_scale=embedding_scale)
             wavs.append(wav)
 
+        return np.concatenate(wavs, axis=0)
+
     def load_random_ref_s(self):
         return torch.randn(1, 256).to(self._device)
     
@@ -363,13 +368,13 @@ class StyleTTS:
 
 
 if __name__ == "__main__":
-    print(StyleTTS)
     stts = StyleTTS()
     sr = 24000
     wave = np.random.randn(sr*10)
-    # print(wave.shape)
-    # print(stts.compute_style(wave=wave, sr=sr, path=None, device='cpu').shape)
-    # print(stts.load_random_ref_s().shape)
-    assert stts("read this in a random voice") is not None
+    
+    print(stts("read this in a random voice").shape)
+    print(stts.predict("read this in a random voice").shape)
+    print(stts.predict_long("simple split by dot (what about split_and_recombine_text tortoise. I'll check it out later)").shape)
+
 
     
