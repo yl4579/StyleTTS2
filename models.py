@@ -12,14 +12,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
 
-from Utils.ASR.models import ASRCNN
-from Utils.JDC.model import JDCNet
+try:
+    from .Utils.ASR.models import ASRCNN
+    from .Utils.JDC.model import JDCNet
 
-from Modules.diffusion.sampler import KDiffusion, LogNormalDistribution
-from Modules.diffusion.modules import Transformer1d, StyleTransformer1d
-from Modules.diffusion.diffusion import AudioDiffusionConditional
+    from .Modules.diffusion.sampler import KDiffusion, LogNormalDistribution
+    from .Modules.diffusion.modules import Transformer1d, StyleTransformer1d
+    from .Modules.diffusion.diffusion import AudioDiffusionConditional
 
-from Modules.discriminators import MultiPeriodDiscriminator, MultiResSpecDiscriminator, WavLMDiscriminator
+    from .Modules.discriminators import MultiPeriodDiscriminator, MultiResSpecDiscriminator, WavLMDiscriminator
+except:
+    from Utils.ASR.models import ASRCNN
+    from Utils.JDC.model import JDCNet
+
+    from Modules.diffusion.sampler import KDiffusion, LogNormalDistribution
+    from Modules.diffusion.modules import Transformer1d, StyleTransformer1d
+    from Modules.diffusion.diffusion import AudioDiffusionConditional
+
+    from Modules.discriminators import MultiPeriodDiscriminator, MultiResSpecDiscriminator, WavLMDiscriminator
 
 from munch import Munch
 import yaml

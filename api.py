@@ -22,12 +22,12 @@ import torchaudio
 import librosa
 from nltk.tokenize import word_tokenize
 
-from models import *
-from utils import *
-from text_utils import TextCleaner
+from .models import *
+from .utils import *
+from .text_utils import TextCleaner
 import phonemizer
-from Utils.PLBERT.util import load_plbert
-from Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
+from .Utils.PLBERT.util import load_plbert
+from .Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
 from typing import Tuple, Type, Union
 from numpy.typing import NDArray
 import os
