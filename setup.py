@@ -14,5 +14,6 @@ setup(
    long_description=open('README.md').read(),
    install_requires=required,
    url="https://github.com/yl4579/StyleTTS2.git",
+   include_package_data=True,
    
 )
