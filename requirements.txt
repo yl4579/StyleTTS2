@@ -1,4 +1,4 @@
-SoundFile
+soundfile
 torchaudio
 torchvision
 munch
@@ -15,10 +15,11 @@ einops-exts
 tqdm
 typing
 typing-extensions
-git+https://github.com/resemble-ai/monotonic_align.git
+monotonic_align @ git+https://github.com/resemble-ai/monotonic_align.git
 phonemizer
 
 
-torch --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
-torchvision --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
-torchaudio --index-url https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
+
+torch @ https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
+torchvision @ https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
+torchaudio @ https://download.pytorch.org/whl/cu118 ; sys_platform == 'win32'
