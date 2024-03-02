@@ -345,7 +345,7 @@ class StyleTTS:
             wave, sr = librosa.load(path, sr=24000)
         audio, index = librosa.effects.trim(wave, top_db=30)
         if sr != 24000:
-            audio = librosa.resample(audio, sr, 24000)
+            audio = librosa.resample(audio, orig_sr=sr, target_sr=24000)
         mel_tensor = self.preprocess(audio).to(device)
 
         with torch.no_grad():
