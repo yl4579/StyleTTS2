@@ -1,5 +1,4 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
 import torchaudio
 from transformers import AutoModel

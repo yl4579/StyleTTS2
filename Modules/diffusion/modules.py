@@ -1,15 +1,15 @@
-from math import floor, log, pi
-from typing import Any, List, Optional, Sequence, Tuple, Union
+from math import log, pi
+from typing import Optional
 
-from .utils import *
+from .utils import default, exists, rand_bool
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from einops import rearrange, reduce, repeat
 from einops.layers.torch import Rearrange
 from einops_exts import rearrange_many
 from torch import Tensor, einsum
-
 
 """
 Utils

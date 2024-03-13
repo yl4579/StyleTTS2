@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from torch.nn import Conv1d, AvgPool1d, Conv2d
+from torch.nn import Conv1d, Conv2d
 from torch.nn.utils import weight_norm, spectral_norm
 
 from .utils import get_padding
@@ -21,8 +21,6 @@ def stft(x, fft_size, hop_size, win_length, window):
     """
     x_stft = torch.stft(x, fft_size, hop_size, win_length, window,
             return_complex=True)
-    real = x_stft[..., 0]
-    imag = x_stft[..., 1]
 
     return torch.abs(x_stft).transpose(2, 1)
 

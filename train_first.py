@@ -1,7 +1,5 @@
 import os
 import os.path as osp
-import re
-import sys
 import yaml
 import shutil
 import numpy as np
@@ -16,10 +14,8 @@ import yaml
 from munch import Munch
 import numpy as np
 import torch
-from torch import nn
 import torch.nn.functional as F
-import torchaudio
-import librosa
+from monotonic_align import mask_from_lens
 
 from models import *
 from meldataset import build_dataloader

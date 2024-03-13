@@ -1,7 +1,5 @@
 #coding: utf-8
-import os
 import os.path as osp
-import time
 import random
 import numpy as np
 import random
@@ -9,8 +7,6 @@ import soundfile as sf
 import librosa
 
 import torch
-from torch import nn
-import torch.nn.functional as F
 import torchaudio
 from torch.utils.data import DataLoader
 
