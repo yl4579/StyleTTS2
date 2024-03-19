@@ -68,9 +68,8 @@ def main(config_path):
     batch_size = config.get('batch_size', 10)
 
     epochs = config.get('epochs_2nd', 200)
-    save_freq = config.get('save_freq', 2)
     log_interval = config.get('log_interval', 10)
-    saving_epoch = config.get('save_freq', 2)
+    save_frequency = config.get('save_freq', 2)
 
     data_params = config.get('data_params', None)
     sr = config['preprocess_params'].get('sr', 24000)
@@ -215,11 +214,7 @@ def main(config_path):
     n_down = model.text_aligner.n_down
 
     best_loss = float('inf')  # best test loss
-    loss_train_record = list([])
-    loss_test_record = list([])
     iters = 0
-    
-    criterion = nn.L1Loss() # F0 loss (regression)
     torch.cuda.empty_cache()
     
     stft_loss = MultiResolutionSTFTLoss().to(device)
@@ -264,7 +259,6 @@ def main(config_path):
 
             with torch.no_grad():
                 mask = length_to_mask(mel_input_length // (2 ** n_down)).to(device)
-                mel_mask = length_to_mask(mel_input_length).to(device)
                 text_mask = length_to_mask(input_lengths).to(texts.device)
 
                 try:
@@ -382,8 +376,6 @@ def main(config_path):
             with torch.no_grad():
                 F0_real, _, F0 = model.pitch_extractor(gt.unsqueeze(1))
                 F0 = F0.reshape(F0.shape[0], F0.shape[1] * 2, F0.shape[2], 1).squeeze()
-
-                asr_real = model.text_aligner.get_feature(gt)
 
                 N_real = log_norm(gt.unsqueeze(1)).squeeze(1)
                 
@@ -767,7 +759,7 @@ def main(config_path):
                     if bib >= 5:
                         break
                             
-        if epoch % saving_epoch == 0:
+        if epoch % save_frequency == 0:
             if (loss_test / iters_test) < best_loss:
                 best_loss = loss_test / iters_test
             print('Saving..')

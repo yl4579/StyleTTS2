@@ -72,9 +72,6 @@ class FilePathDataset(torch.utils.data.Dataset):
                  min_length=50,
                  ):
 
-        spect_params = SPECT_PARAMS
-        mel_params = MEL_PARAMS
-
         _data_list = [l.strip().split('|') for l in data_list]
         self.data_list = [data if len(data) == 3 else (*data, 0) for data in _data_list]
         self.text_cleaner = TextCleaner()

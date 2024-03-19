@@ -74,7 +74,6 @@ def main(config_path):
     epochs = config.get('epochs', 200)
     save_freq = config.get('save_freq', 2)
     log_interval = config.get('log_interval', 10)
-    saving_epoch = config.get('save_freq', 2)
 
     data_params = config.get('data_params', None)
     sr = config['preprocess_params'].get('sr', 24000)
@@ -219,11 +218,8 @@ def main(config_path):
     n_down = model.text_aligner.n_down
 
     best_loss = float('inf')  # best test loss
-    loss_train_record = list([])
-    loss_test_record = list([])
     iters = 0
     
-    criterion = nn.L1Loss() # F0 loss (regression)
     torch.cuda.empty_cache()
     
     stft_loss = MultiResolutionSTFTLoss().to(device)
@@ -231,8 +227,6 @@ def main(config_path):
     print('BERT', optimizer.optimizers['bert'])
     print('decoder', optimizer.optimizers['decoder'])
 
-    start_ds = False
-    
     running_std = []
     
     slmadv_params = Munch(config['slmadv_params'])
@@ -269,7 +263,6 @@ def main(config_path):
             texts, input_lengths, ref_texts, ref_lengths, mels, mel_input_length, ref_mels = batch
             with torch.no_grad():
                 mask = length_to_mask(mel_input_length // (2 ** n_down)).to(device)
-                mel_mask = length_to_mask(mel_input_length).to(device)
                 text_mask = length_to_mask(input_lengths).to(texts.device)
 
                 # compute reference styles

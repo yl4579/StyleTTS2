@@ -41,7 +41,7 @@ class SLMAdversarialLoss(torch.nn.Module):
                          num_steps=num_steps).squeeze(1)
             
         s_dur = s_preds[:, 128:]
-        s = s_preds[:, :128]
+        s_preds[:, :128]
         
         d, _ = self.model.predictor(d_en, s_dur, 
                                                 ref_lengths, 
@@ -96,14 +96,9 @@ class SLMAdversarialLoss(torch.nn.Module):
         mel_len = min(mel_len, self.max_len // 2)
         
         # get clips
-        
         en = []
         p_en = []
         sp = []
-        
-        F0_fakes = []
-        N_fakes = []
-        
         wav = []
 
         for bib in range(len(output_lengths)):

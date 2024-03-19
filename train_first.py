@@ -57,9 +57,8 @@ def main(config_path):
     device = accelerator.device
     
     epochs = config.get('epochs_1st', 200)
-    save_freq = config.get('save_freq', 2)
     log_interval = config.get('log_interval', 10)
-    saving_epoch = config.get('save_freq', 2)
+    save_frequency = config.get('save_freq', 2)
     
     data_params = config.get('data_params', None)
     sr = config['preprocess_params'].get('sr', 24000)
@@ -120,9 +119,6 @@ def main(config_path):
     model = build_model(model_params, text_aligner, pitch_extractor, plbert)
 
     best_loss = float('inf')  # best test loss
-    loss_train_record = list([])
-    loss_test_record = list([])
-
     loss_params = Munch(config['loss_params'])
     TMA_epoch = loss_params.TMA_epoch
     
@@ -409,7 +405,7 @@ def main(config_path):
                     if bib >= 6:
                         break
 
-            if epoch % saving_epoch == 0:
+            if epoch % save_frequency == 0:
                 if (loss_test / iters_test) < best_loss:
                     best_loss = loss_test / iters_test
                 print('Saving..')

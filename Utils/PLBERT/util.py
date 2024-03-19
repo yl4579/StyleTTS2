@@ -19,7 +19,6 @@ def load_plbert(log_dir):
     albert_base_configuration = AlbertConfig(**plbert_config['model_params'])
     bert = CustomAlbert(albert_base_configuration)
 
-    files = os.listdir(log_dir)
     ckpts = []
     for f in os.listdir(log_dir):
         if f.startswith("step_"): ckpts.append(f)
