@@ -116,8 +116,8 @@ class DiscriminatorP(torch.nn.Module):
             t = t + n_pad
         x = x.view(b, c, t // self.period, self.period)
 
-        for l in self.convs:
-            x = l(x)
+        for layer in self.convs:
+            x = layer(x)
             x = F.leaky_relu(x, LRELU_SLOPE)
             fmap.append(x)
         x = self.conv_post(x)
@@ -176,8 +176,8 @@ class WavLMDiscriminator(nn.Module):
         x = self.pre(x)
         
         fmap = []
-        for l in self.convs:
-            x = l(x)
+        for layer in self.convs:
+            x = layer(x)
             x = F.leaky_relu(x, LRELU_SLOPE)
             fmap.append(x)
         x = self.conv_post(x)

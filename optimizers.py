@@ -19,7 +19,7 @@ class MultiOptimizer:
         for key, val in state_dict:
             try:
                 self.optimizers[key].load_state_dict(val)
-            except:
+            except Exception:
                 print("Unloaded %s" % key)
 
     def step(self, key=None, scaler=None):

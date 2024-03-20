@@ -1,26 +1,21 @@
-# load packages
+import copy
+import os
 import random
 import yaml
 import time
 from munch import Munch
 import numpy as np
 import torch
-from torch import nn
 import torch.nn.functional as F
-import torchaudio
-import librosa
 import click
 import shutil
-import warnings
 import logging
 from torch.utils.tensorboard import SummaryWriter
 from monotonic_align import mask_from_lens
 from meldataset import build_dataloader
-from Utils.ASR.models import ASRCNN
-from Utils.JDC.model import JDCNet
 from Utils.PLBERT.util import load_plbert
 from models import build_model, load_ASR_models, load_checkpoint, load_F0_models
-from utils import get_data_path_list, get_image, length_to_mask, log_norm, log_print, maximum_path, recursive_munch
+from utils import get_data_path_list, length_to_mask, log_norm, maximum_path, recursive_munch
 from losses import DiscriminatorLoss, GeneratorLoss, MultiResolutionSTFTLoss, WavLMLoss
 from Modules.slmadv import SLMAdversarialLoss
 from Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
@@ -50,12 +45,13 @@ def main(config_path):
     config = yaml.safe_load(open(config_path))
     
     log_dir = config['log_dir']
-    if not osp.exists(log_dir): os.makedirs(log_dir, exist_ok=True)
-    shutil.copy(config_path, osp.join(log_dir, osp.basename(config_path)))
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+    shutil.copy(config_path, os.path.join(log_dir, os.path.basename(config_path)))
     writer = SummaryWriter(log_dir + "/tensorboard")
 
     # write logs
-    file_handler = logging.FileHandler(osp.join(log_dir, 'train.log'))
+    file_handler = logging.FileHandler(os.path.join(log_dir, 'train.log'))
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter('%(levelname)s:%(asctime)s: %(message)s'))
     logger.addHandler(file_handler)
@@ -136,7 +132,7 @@ def main(config_path):
     
     if not load_pretrained:
         if config.get('first_stage_path', '') != '':
-            first_stage_path = osp.join(log_dir, config.get('first_stage_path', 'first_stage.pth'))
+            first_stage_path = os.path.join(log_dir, config.get('first_stage_path', 'first_stage.pth'))
             print('Loading the first stage model at %s ...' % first_stage_path)
             model, _, start_epoch, iters = load_checkpoint(model, 
                 None, 
@@ -268,7 +264,7 @@ def main(config_path):
                 s2s_attn = s2s_attn.transpose(-1, -2)
                 s2s_attn = s2s_attn[..., 1:]
                 s2s_attn = s2s_attn.transpose(-1, -2)
-            except:
+            except Exception:
                 continue
 
             mask_ST = mask_from_lens(s2s_attn, input_lengths, mel_input_length // (2 ** n_down))
@@ -663,7 +659,7 @@ def main(config_path):
                     loss_f += (loss_F0).mean()
 
                     iters_test += 1
-                except:
+                except Exception:
                     continue
 
         print('Epochs:', epoch + 1)
@@ -685,14 +681,14 @@ def main(config_path):
                 'val_loss': loss_test / iters_test,
                 'epoch': epoch,
             }
-            save_path = osp.join(log_dir, 'epoch_2nd_%05d.pth' % epoch)
+            save_path = os.path.join(log_dir, 'epoch_2nd_%05d.pth' % epoch)
             torch.save(state, save_path)
 
             # if estimate sigma, save the estimated simga
             if model_params.diffusion.dist.estimate_sigma_data:
                 config['model_params']['diffusion']['dist']['sigma_data'] = float(np.mean(running_std))
 
-                with open(osp.join(log_dir, osp.basename(config_path)), 'w') as outfile:
+                with open(os.path.join(log_dir, os.path.basename(config_path)), 'w') as outfile:
                     yaml.dump(config, outfile, default_flow_style=True)
 
                             

@@ -189,8 +189,8 @@ class Discriminator2d(nn.Module):
 
     def get_feature(self, x):
         features = []
-        for l in self.main:
-            x = l(x)
+        for layer in self.main:
+            x = layer(x)
             features.append(x) 
         out = features[-1]
         out = out.view(out.size(0), -1)  # (batch, num_domains)

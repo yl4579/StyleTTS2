@@ -1,7 +1,6 @@
 import math
 import torch
 from torch import nn
-from torch.nn import TransformerEncoder
 import torch.nn.functional as F
 from .layers import MFCC, Attention, LinearNorm, ConvNorm, ConvBlock
 

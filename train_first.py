@@ -6,18 +6,12 @@ from utils import get_data_path_list, get_image, length_to_mask, log_norm, log_p
 from losses import DiscriminatorLoss, GeneratorLoss, MultiResolutionSTFTLoss, WavLMLoss
 from optimizers import build_optimizer
 from accelerate import Accelerator
-from accelerate.utils import LoggerType
 from accelerate import DistributedDataParallelKwargs
 from torch.utils.tensorboard import SummaryWriter
 from accelerate.logging import get_logger
 import os
-import os.path as osp
-import yaml
 import shutil
-import numpy as np
-import torch
 import click
-import warnings
 import random
 import yaml
 import numpy as np
@@ -33,15 +27,16 @@ def main(config_path):
     config = yaml.safe_load(open(config_path))
 
     log_dir = config['log_dir']
-    if not osp.exists(log_dir): os.makedirs(log_dir, exist_ok=True)
-    shutil.copy(config_path, osp.join(log_dir, osp.basename(config_path)))
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+    shutil.copy(config_path, os.path.join(log_dir, os.path.basename(config_path)))
     ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
     accelerator = Accelerator(project_dir=log_dir, split_batches=True, kwargs_handlers=[ddp_kwargs])    
     if accelerator.is_main_process:
         writer = SummaryWriter(log_dir + "/tensorboard")
 
     # write logs
-    file_handler = logging.FileHandler(osp.join(log_dir, 'train.log'))
+    file_handler = logging.FileHandler(os.path.join(log_dir, 'train.log'))
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter('%(levelname)s:%(asctime)s: %(message)s'))
     logger.logger.addHandler(file_handler)
@@ -144,7 +139,7 @@ def main(config_path):
     # in case not distributed
     try:
         n_down = model.text_aligner.module.n_down
-    except:
+    except Exception:
         n_down = model.text_aligner.n_down
     
     # wrapped losses for compatibility with mixed precision
@@ -409,7 +404,7 @@ def main(config_path):
                     'val_loss': loss_test / iters_test,
                     'epoch': epoch,
                 }
-                save_path = osp.join(log_dir, 'epoch_1st_%05d.pth' % epoch)
+                save_path = os.path.join(log_dir, 'epoch_1st_%05d.pth' % epoch)
                 torch.save(state, save_path)
                                 
     if accelerator.is_main_process:
@@ -421,7 +416,7 @@ def main(config_path):
             'val_loss': loss_test / iters_test,
             'epoch': epoch,
         }
-        save_path = osp.join(log_dir, config.get('first_stage_path', 'first_stage.pth'))
+        save_path = os.path.join(log_dir, config.get('first_stage_path', 'first_stage.pth'))
         torch.save(state, save_path)
 
         
