@@ -1,20 +1,18 @@
 #coding: utf-8
+from torch.utils.data import DataLoader
 import os.path as osp
 import random
 import numpy as np
 import random
 import soundfile as sf
 import librosa
-
+import pandas as pd
 import torch
 import torchaudio
-from torch.utils.data import DataLoader
-
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-import pandas as pd
 
 _pad = "$"
 _punctuation = ';:,.!?¡¿—…"«»“” '
