@@ -1,10 +1,5 @@
 #coding:utf-8
-import os, sys
-import os.path as osp
-import numpy as np
 import torch
-from torch import nn
-from torch.optim import Optimizer
 from functools import reduce
 from torch.optim import AdamW
 
@@ -24,7 +19,7 @@ class MultiOptimizer:
         for key, val in state_dict:
             try:
                 self.optimizers[key].load_state_dict(val)
-            except:
+            except Exception:
                 print("Unloaded %s" % key)
 
     def step(self, key=None, scaler=None):

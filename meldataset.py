@@ -1,24 +1,17 @@
 #coding: utf-8
+from torch.utils.data import DataLoader
 import os
-import os.path as osp
-import time
-import random
 import numpy as np
 import random
 import soundfile as sf
 import librosa
-
+import pandas as pd
 import torch
-from torch import nn
-import torch.nn.functional as F
 import torchaudio
-from torch.utils.data import DataLoader
-
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-import pandas as pd
 
 _pad = "$"
 _punctuation = ';:,.!?¡¿—…"«»“” '
@@ -76,10 +69,7 @@ class FilePathDataset(torch.utils.data.Dataset):
                  min_length=50,
                  ):
 
-        spect_params = SPECT_PARAMS
-        mel_params = MEL_PARAMS
-
-        _data_list = [l.strip().split('|') for l in data_list]
+        _data_list = [line.strip().split('|') for line in data_list]
         self.data_list = [data if len(data) == 3 else (*data, 0) for data in _data_list]
         self.text_cleaner = TextCleaner()
         self.sr = sr
@@ -138,7 +128,7 @@ class FilePathDataset(torch.utils.data.Dataset):
     def _load_tensor(self, data):
         wave_path, text, speaker_id = data
         speaker_id = int(speaker_id)
-        wave, sr = sf.read(osp.join(self.root_path, wave_path))
+        wave, sr = sf.read(os.path.join(self.root_path, wave_path))
         if wave.shape[-1] == 2:
             wave = wave[:, 0].squeeze()
         if sr != 24000:

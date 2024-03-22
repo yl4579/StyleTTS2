@@ -19,10 +19,10 @@ def load_plbert(log_dir):
     albert_base_configuration = AlbertConfig(**plbert_config['model_params'])
     bert = CustomAlbert(albert_base_configuration)
 
-    files = os.listdir(log_dir)
     ckpts = []
     for f in os.listdir(log_dir):
-        if f.startswith("step_"): ckpts.append(f)
+        if f.startswith("step_"):
+            ckpts.append(f)
 
     iters = [int(f.split('_')[-1].split('.')[0]) for f in ckpts if os.path.isfile(os.path.join(log_dir, f))]
     iters = sorted(iters)[-1]

@@ -1,8 +1,8 @@
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from torch.nn import Conv1d, ConvTranspose1d, AvgPool1d, Conv2d
-from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
+from torch.nn import Conv1d, ConvTranspose1d
+from torch.nn.utils import weight_norm, remove_weight_norm
 from .utils import init_weights, get_padding
 
 import math
@@ -75,10 +75,10 @@ class AdaINResBlock1(torch.nn.Module):
         return x
 
     def remove_weight_norm(self):
-        for l in self.convs1:
-            remove_weight_norm(l)
-        for l in self.convs2:
-            remove_weight_norm(l)
+        for layer in self.convs1:
+            remove_weight_norm(layer)
+        for layer in self.convs2:
+            remove_weight_norm(layer)
             
 class TorchSTFT(torch.nn.Module):
     def __init__(self, filter_length=800, hop_length=200, win_length=800, window='hann'):
@@ -222,8 +222,7 @@ class SineGen(torch.nn.Module):
         output sine_tensor: tensor(batchsize=1, length, dim)
         output uv: tensor(batchsize=1, length, 1)
         """
-        f0_buf = torch.zeros(f0.shape[0], f0.shape[1], self.dim,
-                             device=f0.device)
+        torch.zeros(f0.shape[0], f0.shape[1], self.dim, device=f0.device)
         # fundamental component
         fn = torch.multiply(f0, torch.FloatTensor([[range(1, self.harmonic_num + 2)]]).to(f0.device))
 
@@ -399,10 +398,10 @@ class Generator(torch.nn.Module):
 
     def remove_weight_norm(self):
         print('Removing weight norm...')
-        for l in self.ups:
-            remove_weight_norm(l)
-        for l in self.resblocks:
-            l.remove_weight_norm()
+        for layer in self.ups:
+            remove_weight_norm(layer)
+        for layer in self.resblocks:
+            layer.remove_weight_norm()
         remove_weight_norm(self.conv_pre)
         remove_weight_norm(self.conv_post)
 

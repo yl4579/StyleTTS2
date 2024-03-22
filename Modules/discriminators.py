@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from torch.nn import Conv1d, AvgPool1d, Conv2d
+from torch.nn import Conv1d, Conv2d
 from torch.nn.utils import weight_norm, spectral_norm
 
 from .utils import get_padding
@@ -21,8 +21,6 @@ def stft(x, fft_size, hop_size, win_length, window):
     """
     x_stft = torch.stft(x, fft_size, hop_size, win_length, window,
             return_complex=True)
-    real = x_stft[..., 0]
-    imag = x_stft[..., 1]
 
     return torch.abs(x_stft).transpose(2, 1)
 
@@ -31,7 +29,7 @@ class SpecDiscriminator(nn.Module):
 
     def __init__(self, fft_size=1024, shift_size=120, win_length=600, window="hann_window", use_spectral_norm=False):
         super(SpecDiscriminator, self).__init__()
-        norm_f = weight_norm if use_spectral_norm == False else spectral_norm
+        norm_f = weight_norm if use_spectral_norm is False else spectral_norm
         self.fft_size = fft_size
         self.shift_size = shift_size
         self.win_length = win_length
@@ -97,7 +95,7 @@ class DiscriminatorP(torch.nn.Module):
     def __init__(self, period, kernel_size=5, stride=3, use_spectral_norm=False):
         super(DiscriminatorP, self).__init__()
         self.period = period
-        norm_f = weight_norm if use_spectral_norm == False else spectral_norm
+        norm_f = weight_norm if use_spectral_norm is False else spectral_norm
         self.convs = nn.ModuleList([
             norm_f(Conv2d(1, 32, (kernel_size, 1), (stride, 1), padding=(get_padding(5, 1), 0))),
             norm_f(Conv2d(32, 128, (kernel_size, 1), (stride, 1), padding=(get_padding(5, 1), 0))),
@@ -118,8 +116,8 @@ class DiscriminatorP(torch.nn.Module):
             t = t + n_pad
         x = x.view(b, c, t // self.period, self.period)
 
-        for l in self.convs:
-            x = l(x)
+        for layer in self.convs:
+            x = layer(x)
             x = F.leaky_relu(x, LRELU_SLOPE)
             fmap.append(x)
         x = self.conv_post(x)
@@ -163,7 +161,7 @@ class WavLMDiscriminator(nn.Module):
                  initial_channel=64, 
                  use_spectral_norm=False):
         super(WavLMDiscriminator, self).__init__()
-        norm_f = weight_norm if use_spectral_norm == False else spectral_norm
+        norm_f = weight_norm if use_spectral_norm is False else spectral_norm
         self.pre = norm_f(Conv1d(slm_hidden * slm_layers, initial_channel, 1, 1, padding=0))
         
         self.convs = nn.ModuleList([
@@ -178,8 +176,8 @@ class WavLMDiscriminator(nn.Module):
         x = self.pre(x)
         
         fmap = []
-        for l in self.convs:
-            x = l(x)
+        for layer in self.convs:
+            x = layer(x)
             x = F.leaky_relu(x, LRELU_SLOPE)
             fmap.append(x)
         x = self.conv_post(x)

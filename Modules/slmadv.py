@@ -41,7 +41,7 @@ class SLMAdversarialLoss(torch.nn.Module):
                          num_steps=num_steps).squeeze(1)
             
         s_dur = s_preds[:, 128:]
-        s = s_preds[:, :128]
+        s_preds[:, :128]
         
         d, _ = self.model.predictor(d_en, s_dur, 
                                                 ref_lengths, 
@@ -61,20 +61,20 @@ class SLMAdversarialLoss(torch.nn.Module):
             _s2s_pred = torch.sigmoid(_s2s_pred_org)
             _dur_pred = _s2s_pred.sum(axis=-1)
 
-            l = int(torch.round(_s2s_pred.sum()).item())
-            t = torch.arange(0, l).expand(l)
+            length = int(torch.round(_s2s_pred.sum()).item())
+            t = torch.arange(0, length).expand(length)
 
-            t = torch.arange(0, l).unsqueeze(0).expand((len(_s2s_pred), l)).to(ref_text.device)
+            t = torch.arange(0, length).unsqueeze(0).expand((len(_s2s_pred), length)).to(ref_text.device)
             loc = torch.cumsum(_dur_pred, dim=0) - _dur_pred / 2
 
-            h = torch.exp(-0.5 * torch.square(t - (l - loc.unsqueeze(-1))) / (self.sig)**2)
+            h = torch.exp(-0.5 * torch.square(t - (length - loc.unsqueeze(-1))) / (self.sig)**2)
 
             out = torch.nn.functional.conv1d(_s2s_pred_org.unsqueeze(0), 
                                          h.unsqueeze(1), 
-                                         padding=h.shape[-1] - 1, groups=int(_text_length))[..., :l]
+                                         padding=h.shape[-1] - 1, groups=int(_text_length))[..., :length]
             attn_preds.append(F.softmax(out.squeeze(), dim=0))
 
-            output_lengths.append(l)
+            output_lengths.append(length)
 
         max_len = max(output_lengths)
         
@@ -96,14 +96,9 @@ class SLMAdversarialLoss(torch.nn.Module):
         mel_len = min(mel_len, self.max_len // 2)
         
         # get clips
-        
         en = []
         p_en = []
         sp = []
-        
-        F0_fakes = []
-        N_fakes = []
-        
         wav = []
 
         for bib in range(len(output_lengths)):

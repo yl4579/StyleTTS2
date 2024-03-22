@@ -1,16 +1,10 @@
 #coding:utf-8
-
-import os
-import os.path as osp
-
-import copy
 import math
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
+from torch.nn.utils import weight_norm, spectral_norm
 
 from Utils.ASR.models import ASRCNN
 from Utils.JDC.model import JDCNet
@@ -195,8 +189,8 @@ class Discriminator2d(nn.Module):
 
     def get_feature(self, x):
         features = []
-        for l in self.main:
-            x = l(x)
+        for layer in self.main:
+            x = layer(x)
             features.append(x) 
         out = features[-1]
         out = out.view(out.size(0), -1)  # (batch, num_domains)
@@ -467,9 +461,6 @@ class ProsodyPredictor(nn.Module):
 
     def forward(self, texts, style, text_lengths, alignment, m):
         d = self.text_encoder(texts, style, text_lengths, m)
-        
-        batch_size = d.shape[0]
-        text_size = d.shape[1]
         
         # predict duration
         input_lengths = text_lengths.cpu().numpy()
