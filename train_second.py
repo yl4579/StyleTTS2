@@ -8,13 +8,13 @@ from Modules.slmadv import SLMAdversarialLoss
 from Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
 from optimizers import build_optimizer
 from monotonic_align import mask_from_lens
+from munch import Munch
 
 import logging
 import copy
 import os
 import yaml
 import time
-from munch import Munch
 import numpy as np
 import torch
 import click
@@ -434,9 +434,6 @@ def main(config_path):
 
             running_loss += loss_mel.item()
             g_loss.backward()
-            if torch.isnan(g_loss):
-                from IPython.core.debugger import set_trace
-                set_trace()
 
             optimizer.step('bert_encoder')
             optimizer.step('bert')
