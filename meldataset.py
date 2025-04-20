@@ -20,6 +20,11 @@ logger.setLevel(logging.DEBUG)
 
 import pandas as pd
 
+from collections import defaultdict
+
+skip_stats = defaultdict(int)  # Tracks reasons and counts
+SKIP_LOG_PATH = "skipped_samples.log"
+
 _pad = "$"
 _punctuation = ';:,.!?¡¿—…"«»“” '
 _letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -103,37 +108,69 @@ class FilePathDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.data_list)
 
-    def __getitem__(self, idx):        
-        data = self.data_list[idx]
-        path = data[0]
-        
-        wave, text_tensor, speaker_id = self._load_tensor(data)
-        
-        mel_tensor = preprocess(wave).squeeze()
-        
-        acoustic_feature = mel_tensor.squeeze()
-        length_feature = acoustic_feature.size(1)
-        acoustic_feature = acoustic_feature[:, :(length_feature - length_feature % 2)]
-        
-        # get reference sample
-        ref_data = (self.df[self.df[2] == str(speaker_id)]).sample(n=1).iloc[0].tolist()
-        ref_mel_tensor, ref_label = self._load_data(ref_data[:3])
-        
-        # get OOD text
-        
-        ps = ""
-        
-        while len(ps) < self.min_length:
-            rand_idx = np.random.randint(0, len(self.ptexts) - 1)
-            ps = self.ptexts[rand_idx]
-            
-            text = self.text_cleaner(ps)
-            text.insert(0, 0)
-            text.append(0)
+    def __getitem__(self, idx):
+        try:
+            return self._safe_get_item(idx)
+        except Exception as e:
+            reason = str(e)
+            skip_stats[reason] += 1
 
-            ref_text = torch.LongTensor(text)
-        
-        return speaker_id, acoustic_feature, text_tensor, ref_text, ref_mel_tensor, ref_label, path, wave
+        try:
+            sample_path = self.data_list[idx][0]
+            with open(SKIP_LOG_PATH, 'a') as f:
+                f.write(f"{sample_path} | {reason}\n")
+        except:
+            pass
+
+        logger.warning(f"[Skipped] {reason} | idx: {idx}")
+        new_idx = random.randint(0, len(self.data_list) - 1)
+        return self.__getitem__(new_idx)
+
+
+    def _safe_get_item(self, idx):
+        for _ in range(3):  # Try a few times to get a valid sample
+            data = self.data_list[idx]
+            wave, text_tensor, speaker_id = self._load_tensor(data)
+
+            if wave is None or text_tensor is None:
+                idx = random.randint(0, len(self.data_list) - 1)
+                continue
+
+            mel_tensor = preprocess(wave).squeeze()
+
+            if torch.isnan(mel_tensor).any() or mel_tensor.shape[1] < 80:
+                print(f"[NaN or short mel] Skipping: {data[0]}")
+                idx = random.randint(0, len(self.data_list) - 1)
+                continue
+
+            if mel_tensor.abs().sum() < 1e-3:
+                print(f"[All-zero mel] Skipping: {data[0]}")
+                idx = random.randint(0, len(self.data_list) - 1)
+                continue
+            acoustic_feature = mel_tensor[:, :(mel_tensor.shape[1] - mel_tensor.shape[1] % 2)]
+
+            try:
+                # Reference mel
+                ref_data = (self.df[self.df[2] == str(speaker_id)]).sample(n=1).iloc[0].tolist()
+                ref_mel_tensor, ref_label = self._load_data(ref_data[:3])
+            except:
+                idx = random.randint(0, len(self.data_list) - 1)
+                continue
+
+            # OOD Text
+            ps = ""
+            while len(ps) < self.min_length:
+                rand_idx = np.random.randint(0, len(self.ptexts) - 1)
+                ps = self.ptexts[rand_idx]
+                text = self.text_cleaner(ps)
+                text.insert(0, 0)
+                text.append(0)
+                ref_text = torch.LongTensor(text)
+
+            return speaker_id, acoustic_feature, text_tensor, ref_text, ref_mel_tensor, ref_label, data[0], wave
+
+        # All retries failed — return None
+        return None
 
     def _load_tensor(self, data):
         wave_path, text, speaker_id = data
@@ -144,6 +181,10 @@ class FilePathDataset(torch.utils.data.Dataset):
         if sr != 24000:
             wave = librosa.resample(wave, orig_sr=sr, target_sr=24000)
             print(wave_path, sr)
+
+        # Skip samples with wave too short
+        if len(wave) < 1000:
+            raise ValueError(f"Wave too short: {wave_path} - length: {len(wave)}")
             
         wave = np.concatenate([np.zeros([5000]), wave, np.zeros([5000])], axis=0)
         
@@ -159,6 +200,10 @@ class FilePathDataset(torch.utils.data.Dataset):
     def _load_data(self, data):
         wave, text_tensor, speaker_id = self._load_tensor(data)
         mel_tensor = preprocess(wave).squeeze()
+
+	# Skip if mel is empty or has NaNs
+        if mel_tensor.numel() == 0 or torch.isnan(mel_tensor).any():
+            raise ValueError(f"Invalid mel from wave: {path}")
 
         mel_length = mel_tensor.size(1)
         if mel_length > self.max_mel_length:
@@ -184,6 +229,8 @@ class Collater(object):
     def __call__(self, batch):
         # batch[0] = wave, mel, text, f0, speakerid
         batch_size = len(batch)
+        if len(batch) == 0:
+            return None
 
         # sort by mel length
         lengths = [b[1].shape[1] for b in batch]

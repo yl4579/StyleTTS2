@@ -1,7 +1,8 @@
 SoundFile
-torchaudio
 munch
-torch
+torch==2.2.2
+torchaudio==2.2.2
+torchvision==0.17.2
 pydub
 pyyaml
 librosa
@@ -11,7 +12,10 @@ accelerate
 transformers
 einops
 einops-exts
+pandas
 tqdm
+numpy<2
+tensorboard
 typing
 typing-extensions
 git+https://github.com/resemble-ai/monotonic_align.git
