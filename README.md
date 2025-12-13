@@ -1,8 +1,5 @@
 # StyleTTS 2 API
 
-> [!CAUTION]
-> The Streaming API is not fully implemented yet.
-
 [Original Repo](https://github.com/yl4579/StyleTTS2) - [CLI Tool](https://github.com/fakerybakery/styletTS2-cli) - **Streaming API**
 
 (GPL licensed due to Phonemizer. Should I switch to OpenPhonemizer and make it MIT-licensed?)
@@ -27,9 +24,9 @@ Online demo: [Hugging Face](https://huggingface.co/spaces/styletts2/styletts2) (
 - [x] Add a finetuning script for new speakers with base pre-trained multispeaker models
 - [x] REST API
 - [x] Importable inference script (PR #78)
+- [x] Streaming API and WebSocket support
 - [ ] Fix DDP (accelerator) for `train_second.py` **(I have tried everything I could to fix this but had no success, so if you are willing to help, please see [#7](https://github.com/yl4579/StyleTTS2/issues/7))**
 - [ ] Pip package
-- [ ] Demo of audio streaming
 
 ## Pre-requisites
 1. Python >= 3.7
@@ -56,15 +53,53 @@ For LibriTTS, you will need to combine train-clean-360 with train-clean-100 and 
 
 ## Streaming API
 
-You can use StyleTTS 2 in your projects by launching the HTTP API with streaming support. Synthesize text from your frontend apps, etc by making HTTP calls to the API server. The server uses Flask. It has not been extensively tested and should not be used for production purposes.
+You can use StyleTTS 2 in your projects by launching the HTTP API with streaming support. Synthesize text from your frontend apps, etc by making HTTP calls to the API server. The server uses Flask.
 
 API documentation may be found in the [`API_DOCS.md`](API_DOCS.md) file.
 
 Launch server:
 
-```
+```bash
 python api.py
 ```
+
+## WebSocket API
+
+For real-time TTS streaming with chunked text input and low-latency audio output, use the WebSocket API powered by FastAPI.
+
+**Features:**
+- Real-time bidirectional communication
+- Chunked text input (send text incrementally)
+- Base64-encoded MP3 audio output
+- GPU queue management for concurrent requests
+- Idle timeout and connection management
+
+**Quick Start:**
+
+```bash
+# Start WebSocket server (default port 8765)
+python ws_server.py
+
+# Or with custom port
+python ws_server.py 9000
+```
+
+**Endpoints:**
+- WebSocket: `ws://localhost:8765/ws/tts`
+- Health Check: `http://localhost:8765/health`
+- Voice List: `http://localhost:8765/voices`
+
+**Test the WebSocket API:**
+
+```bash
+# Simple test
+python test_ws_client.py --text "Hello world" --voice f-us-1 --output output.mp3
+
+# Chunked streaming test
+python test_ws_client.py --text "This is a longer text" --voice m-us-2 --chunked
+```
+
+Full WebSocket documentation: [`WEBSOCKET_DOCS.md`](WEBSOCKET_DOCS.md)
 
 ## Python API
 
