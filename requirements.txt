@@ -22,3 +22,6 @@ tortoise-tts # for the Gradio demo, splitting text
 flask # for api
 markdown # for api
 flask-cors
+fastapi # for WebSocket API
+uvicorn[standard] # ASGI server for WebSocket
+websockets # WebSocket support
