@@ -585,7 +585,7 @@ def load_F0_models(path):
     # load F0 model
 
     F0_model = JDCNet(num_class=1, seq_len=192)
-    params = torch.load(path, map_location='cpu')['net']
+    params = torch.load(path, map_location='cpu', weights_only=False)['net']
     F0_model.load_state_dict(params)
     _ = F0_model.train()
     
@@ -601,7 +601,7 @@ def load_ASR_models(ASR_MODEL_PATH, ASR_MODEL_CONFIG):
 
     def _load_model(model_config, model_path):
         model = ASRCNN(**model_config)
-        params = torch.load(model_path, map_location='cpu')['model']
+        params = torch.load(model_path, map_location='cpu', weights_only=False)['model']
         model.load_state_dict(params)
         return model
 
@@ -694,7 +694,7 @@ def build_model(args, text_aligner, pitch_extractor, bert):
     return nets
 
 def load_checkpoint(model, optimizer, path, load_only_params=True, ignore_modules=[]):
-    state = torch.load(path, map_location='cpu')
+    state = torch.load(path, map_location='cpu', weights_only=False)
     params = state['net']
     for key in model:
         if key in params and key not in ignore_modules:
