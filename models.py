@@ -611,9 +611,9 @@ def load_ASR_models(ASR_MODEL_PATH, ASR_MODEL_CONFIG):
 
     return asr_model
 
-def build_model(args, text_aligner, pitch_extractor, bert):
+def build_model(args, text_aligner, pitch_extractor, bert, use_fp16=False):
     assert args.decoder.type in ['istftnet', 'hifigan'], 'Decoder type unknown'
-    
+
     if args.decoder.type == "istftnet":
         from Modules.istftnet import Decoder
         decoder = Decoder(dim_in=args.hidden_dim, style_dim=args.style_dim, dim_out=args.n_mels,
@@ -621,8 +621,8 @@ def build_model(args, text_aligner, pitch_extractor, bert):
                 upsample_rates = args.decoder.upsample_rates,
                 upsample_initial_channel=args.decoder.upsample_initial_channel,
                 resblock_dilation_sizes=args.decoder.resblock_dilation_sizes,
-                upsample_kernel_sizes=args.decoder.upsample_kernel_sizes, 
-                gen_istft_n_fft=args.decoder.gen_istft_n_fft, gen_istft_hop_size=args.decoder.gen_istft_hop_size) 
+                upsample_kernel_sizes=args.decoder.upsample_kernel_sizes,
+                gen_istft_n_fft=args.decoder.gen_istft_n_fft, gen_istft_hop_size=args.decoder.gen_istft_hop_size)
     else:
         from Modules.hifigan import Decoder
         decoder = Decoder(dim_in=args.hidden_dim, style_dim=args.style_dim, dim_out=args.n_mels,
@@ -630,7 +630,8 @@ def build_model(args, text_aligner, pitch_extractor, bert):
                 upsample_rates = args.decoder.upsample_rates,
                 upsample_initial_channel=args.decoder.upsample_initial_channel,
                 resblock_dilation_sizes=args.decoder.resblock_dilation_sizes,
-                upsample_kernel_sizes=args.decoder.upsample_kernel_sizes) 
+                upsample_kernel_sizes=args.decoder.upsample_kernel_sizes,
+                use_fp16=use_fp16)
         
     text_encoder = TextEncoder(channels=args.hidden_dim, kernel_size=5, depth=args.n_layer, n_symbols=args.n_token)
     

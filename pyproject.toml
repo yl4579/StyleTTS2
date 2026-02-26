@@ -1,0 +1,24 @@
+[project]
+name = "styletts2"
+version = "0.0.0"
+requires-python = ">=3.9"
+dependencies = [
+    "SoundFile",
+    "accelerate",
+    "einops",
+    "einops-exts",
+    "librosa",
+    "matplotlib",
+    "munch",
+    "nltk",
+    "numpy",
+    "phonemizer",
+    "pydub",
+    "pyyaml",
+    "scipy",
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "tqdm",
+    "transformers>=4.30",
+    "monotonic-align @ git+https://github.com/resemble-ai/monotonic_align.git",
+]

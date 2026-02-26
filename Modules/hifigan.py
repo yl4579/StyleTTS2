@@ -193,8 +193,6 @@ class SineGen(torch.nn.Module):
         output sine_tensor: tensor(batchsize=1, length, dim)
         output uv: tensor(batchsize=1, length, 1)
         """
-        f0_buf = torch.zeros(f0.shape[0], f0.shape[1], self.dim,
-                             device=f0.device)
         # fundamental component
         fn = torch.multiply(f0, torch.FloatTensor([[range(1, self.harmonic_num + 2)]]).to(f0.device))
 
@@ -237,8 +235,9 @@ class SourceModuleHnNSF(torch.nn.Module):
     """
 
     def __init__(self, sampling_rate, upsample_scale, harmonic_num=0, sine_amp=0.1,
-                 add_noise_std=0.003, voiced_threshod=0):
+                 add_noise_std=0.003, voiced_threshod=0, use_fp16=False):
         super(SourceModuleHnNSF, self).__init__()
+        self.dtype = torch.float16 if use_fp16 else torch.float32
 
         self.sine_amp = sine_amp
         self.noise_std = add_noise_std
@@ -261,7 +260,7 @@ class SourceModuleHnNSF(torch.nn.Module):
         # source for harmonic branch
         with torch.no_grad():
             sine_wavs, uv, _ = self.l_sin_gen(x)
-        sine_merge = self.l_tanh(self.l_linear(sine_wavs))
+        sine_merge = self.l_tanh(self.l_linear(sine_wavs.to(self.dtype)))
 
         # source for noise branch, in the same shape as uv
         noise = torch.randn_like(uv) * self.sine_amp / 3
@@ -270,7 +269,7 @@ def padDiff(x):
     return F.pad(F.pad(x, (0,0,-1,1), 'constant', 0) - x, (0,0,0,-1), 'constant', 0)
 
 class Generator(torch.nn.Module):
-    def __init__(self, style_dim, resblock_kernel_sizes, upsample_rates, upsample_initial_channel, resblock_dilation_sizes, upsample_kernel_sizes):
+    def __init__(self, style_dim, resblock_kernel_sizes, upsample_rates, upsample_initial_channel, resblock_dilation_sizes, upsample_kernel_sizes, use_fp16=False):
         super(Generator, self).__init__()
         self.num_kernels = len(resblock_kernel_sizes)
         self.num_upsamples = len(upsample_rates)
@@ -279,7 +278,7 @@ class Generator(torch.nn.Module):
         self.m_source = SourceModuleHnNSF(
                     sampling_rate=24000,
                     upsample_scale=np.prod(upsample_rates),
-                    harmonic_num=8, voiced_threshod=10)
+                    harmonic_num=8, voiced_threshod=10, use_fp16=use_fp16)
 
         self.f0_upsamp = torch.nn.Upsample(scale_factor=np.prod(upsample_rates))
         self.noise_convs = nn.ModuleList()
@@ -419,9 +418,9 @@ class Decoder(nn.Module):
                 upsample_rates = [10,5,3,2],
                 upsample_initial_channel=512,
                 resblock_dilation_sizes=[[1,3,5], [1,3,5], [1,3,5]],
-                upsample_kernel_sizes=[20,10,6,4]):
+                upsample_kernel_sizes=[20,10,6,4], use_fp16=False):
         super().__init__()
-        
+
         self.decode = nn.ModuleList()
         
         self.encode = AdainResBlk1d(dim_in + 2, 1024, style_dim)
@@ -440,7 +439,7 @@ class Decoder(nn.Module):
         )
         
         
-        self.generator = Generator(style_dim, resblock_kernel_sizes, upsample_rates, upsample_initial_channel, resblock_dilation_sizes, upsample_kernel_sizes)
+        self.generator = Generator(style_dim, resblock_kernel_sizes, upsample_rates, upsample_initial_channel, resblock_dilation_sizes, upsample_kernel_sizes, use_fp16=use_fp16)
 
         
     def forward(self, asr, F0_curve, N, s):
