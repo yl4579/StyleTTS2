@@ -27,7 +27,7 @@ def load_plbert(log_dir):
     iters = [int(f.split('_')[-1].split('.')[0]) for f in ckpts if os.path.isfile(os.path.join(log_dir, f))]
     iters = sorted(iters)[-1]
 
-    checkpoint = torch.load(log_dir + "/step_" + str(iters) + ".t7", map_location='cpu')
+    checkpoint = torch.load(log_dir + "/step_" + str(iters) + ".t7", map_location='cpu', weights_only=False)
     state_dict = checkpoint['net']
     from collections import OrderedDict
     new_state_dict = OrderedDict()
