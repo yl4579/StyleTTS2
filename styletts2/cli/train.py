@@ -84,14 +84,28 @@ def train(
 
     tb_logger = TensorBoardLogger(save_dir=log_dir, name="tensorboard", version="")
 
-    checkpoint_cb = ModelCheckpoint(
+    ckpt_filename = f"epoch_{mode.value[0]}_" + "{epoch:05d}"
+    # Always keep the last checkpoint regardless of performance.
+    last_ckpt_callback = ModelCheckpoint(
         dirpath=log_dir,
-        filename=f"epoch_{mode.value[0]}_" + "{epoch:05d}",
-        every_n_epochs=config.get("save_freq", 2),
-        save_top_k=-1,
+        filename=ckpt_filename,
+        save_top_k=1,
         save_last=True,
+        every_n_train_steps=tr.ckpt_steps,
+        every_n_epochs=tr.ckpt_epochs,
+        enable_version_counter=True,
+        save_on_train_epoch_end=True,
+    )
+    # Keep only the top-k checkpoints ranked by val/mel (lower is better).
+    monitored_ckpt_callback = ModelCheckpoint(
+        dirpath=log_dir,
+        filename=ckpt_filename,
         monitor="val/mel",
         mode="min",
+        save_top_k=tr.save_top_k_ckpts,
+        every_n_train_steps=tr.ckpt_steps,
+        every_n_epochs=tr.ckpt_epochs,
+        enable_version_counter=False,
     )
     lr_monitor = LearningRateMonitor(logging_interval="step")
 
@@ -119,7 +133,7 @@ def train(
         strategy=resolved_strategy,
         precision=precision,
         logger=tb_logger,
-        callbacks=[checkpoint_cb, lr_monitor],
+        callbacks=[monitored_ckpt_callback, last_ckpt_callback, lr_monitor],
         log_every_n_steps=config.get("log_interval", 10),
         enable_progress_bar=True,
     )
